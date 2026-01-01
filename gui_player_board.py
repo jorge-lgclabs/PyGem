@@ -10,9 +10,8 @@ from gui_cards import GameCard
 
 
 class PlayerBank:
-    def __init__(self, page: ft.Page, player_obj: player.Player):
+    def __init__(self, player_obj: player.Player):
         self.lookup = GEM_LOOKUP
-        self.page = page
         self.size = PLAYER_BANK_CELL_SIZE
         self.player_obj = player_obj
 

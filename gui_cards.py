@@ -98,9 +98,8 @@ class GameCard:
         self.row_lists[0][2].content = self.gem
 
 class CardMarket:
-    def __init__(self, page: ft.Page, game: PyGem.GameMaster):
+    def __init__(self,game: PyGem.GameMaster):
         self.game = game
-        self.page = page
 
         self.grid_1_0 = ft.Container(content=None)
         self.grid_1_1 = ft.Container(content=None)
