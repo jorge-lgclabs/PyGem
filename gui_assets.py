@@ -23,12 +23,12 @@ PLAYER_BANK_ROUNDING_RADIUS = PLAYER_BANK_CELL_SIZE * .32
 
 GEM_COLORS = [RED, BLUE, GREEN, WHITE, NOIR]
 
-RED_GEM = ft.Image(src="/icons/ruby-red-diamond-inline.svg", fit=ft.ImageFit.CONTAIN)
-BLUE_GEM = ft.Image(src="/icons/sapphire-octagon-inline.svg", fit=ft.ImageFit.CONTAIN)
-GREEN_GEM = ft.Image(src="/icons/emerald-square-inline.svg", fit=ft.ImageFit.CONTAIN)
-WHITE_GEM = ft.Image(src="/icons/diamond-blue-inline.svg", fit=ft.ImageFit.CONTAIN)
-NOIR_GEM = ft.Image(src="/icons/obsidian-rectangle-inline.svg", fit=ft.ImageFit.CONTAIN)
-GOLD_COIN = ft.Image(src="/icons/gold-coin-inline.svg", fit=ft.ImageFit.CONTAIN)
+RED_GEM = ft.Image(src="/icons/ruby-red-diamond-inline.svg", fit=ft.BoxFit.CONTAIN)
+BLUE_GEM = ft.Image(src="/icons/sapphire-octagon-inline.svg", fit=ft.BoxFit.CONTAIN)
+GREEN_GEM = ft.Image(src="/icons/emerald-square-inline.svg", fit=ft.BoxFit.CONTAIN)
+WHITE_GEM = ft.Image(src="/icons/diamond-blue-inline.svg", fit=ft.BoxFit.CONTAIN)
+NOIR_GEM = ft.Image(src="/icons/obsidian-rectangle-inline.svg", fit=ft.BoxFit.CONTAIN)
+GOLD_COIN = ft.Image(src="/icons/gold-coin-inline.svg", fit=ft.BoxFit.CONTAIN)
 GEM_ICONS = [RED_GEM, BLUE_GEM, GREEN_GEM, WHITE_GEM, NOIR_GEM, GOLD_COIN]
 
 GEM_LOOKUP = {"g" : (GREEN, GREEN_GEM, 'green'), "r" : (RED, RED_GEM, 'red'), "b" : (BLUE, BLUE_GEM, 'blue'), "w" : (WHITE, WHITE_GEM, 'white'), "n" : (NOIR, NOIR_GEM, 'noir')}

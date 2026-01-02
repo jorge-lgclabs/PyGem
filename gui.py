@@ -19,5 +19,5 @@ def gui(page: ft.Page):
     page.add(gui_game.load_full_gui())
 
 
-ft.app(gui, assets_dir="assets")
+ft.run(gui, assets_dir="assets")
 

@@ -54,10 +54,10 @@ class GameCard:
                 offset=ft.Offset(0, (CARD_ROUNDING_RADIUS / 2)),
                 color=ft.Colors.with_opacity(0.25, ft.Colors.BLACK)
             ),
-            alignment=ft.alignment.center)
+            alignment=ft.alignment.Alignment.CENTER)
 
     def set_bg(self, level, bg_num, gem_string):
-        return ft.Image(src=f"/images/{gem_string}{level}-{bg_num}.png", border_radius=ft.border_radius.all(CARD_ROUNDING_RADIUS), fit=ft.ImageFit.COVER, width=CARD_WIDTH, height=CARD_HEIGHT)
+        return ft.Image(src=f"/images/{gem_string}{level}-{bg_num}.png", border_radius=ft.border_radius.all(CARD_ROUNDING_RADIUS), fit=ft.BoxFit.COVER, width=CARD_WIDTH, height=CARD_HEIGHT)
 
     def set_shade(self, color):
         return ft.Container(
@@ -67,7 +67,7 @@ class GameCard:
             clip_behavior=ft.ClipBehavior.ANTI_ALIAS,
             bgcolor=color,
             opacity=SHADE_OPACITY,
-            alignment=ft.alignment.center)
+            alignment=ft.alignment.Alignment.CENTER)
 
     def insert_cost_circle(self, color, price, count):
         if count == 0:
@@ -122,7 +122,7 @@ class CardMarket:
         self.place_containers_in_grid()
         self.initialize_market_grid()
 
-        self.gui_obj = ft.Container(content=self.card_market_grid, alignment=ft.alignment.center, width=CARD_WIDTH * 5.25)
+        self.gui_obj = ft.Container(content=self.card_market_grid, alignment=ft.alignment.Alignment.CENTER, width=CARD_WIDTH * 5.25)
 
     def place_containers_in_grid(self):
         self.card_market_grid.controls = [self.level_3_deck, self.grid_3_0, self.grid_3_1, self.grid_3_2, self.grid_3_3,
@@ -158,7 +158,7 @@ class CardMarket:
 
     def create_level_deck(self, level: int):
         bg_img = ft.Image(src=f"/images/level-{level}-deck.png",
-                 border_radius=ft.border_radius.all(CARD_ROUNDING_RADIUS), fit=ft.ImageFit.COVER, width=CARD_WIDTH,
+                 border_radius=ft.border_radius.all(CARD_ROUNDING_RADIUS), fit=ft.BoxFit.COVER, width=CARD_WIDTH,
                  height=CARD_HEIGHT, opacity=.42)
         if level == 1:
             text = "I"
@@ -167,11 +167,11 @@ class CardMarket:
         else:
             text = "III"
 
-        text = ft.Text(value=text, size=CARD_HEIGHT * .5, text_align=ft.alignment.center, font_family="lobster", style=FILLED_WITH_STROKE)
+        text = ft.Text(value=text, size=CARD_HEIGHT * .5, text_align=ft.TextAlign.CENTER, font_family="lobster", style=FILLED_WITH_STROKE)
 
 
 
-        return ft.Stack(controls=[bg_img, text], alignment=ft.alignment.center)
+        return ft.Stack(controls=[bg_img, text], alignment=ft.alignment.Alignment.CENTER)
 
 
     def update_market_grid(self):
