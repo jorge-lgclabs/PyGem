@@ -199,4 +199,12 @@ class CardMarket:
                 container.update()
                 break
 
+    def get_all_cards(self):
+        card_tuples = []
+        for coord in self.coord_grid:
+            card_level, card_pos = coord
+            card_container = getattr(self, f"grid_{card_level}_{card_pos}")
+            card_object = self.game.get_visible_cards(card_level)[card_pos]
+            card_tuples.append((card_container, card_object))
 
+        return card_tuples

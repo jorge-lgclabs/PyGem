@@ -1,8 +1,9 @@
-import gui_cards, gui_player_board, gui_game_bank
+import gui_cards, gui_player_board, gui_game_bank, gui_functions
+from PyGem import GameMaster
 import flet as ft
 
 class GuiGameMaster:
-    def __init__(self, game):
+    def __init__(self, game: GameMaster):
         self.game = game
         self.market = gui_cards.CardMarket(game)
         self.game_bank = gui_game_bank.GameBank(game)
@@ -16,6 +17,24 @@ class GuiGameMaster:
         return ft.Row(controls=[market_and_player_board, self.game_bank.gui_obj], spacing=30,
                         vertical_alignment=ft.CrossAxisAlignment.CENTER, alignment=ft.MainAxisAlignment.CENTER)
 
+    def update_all_components(self):
+        self.market.update_market_grid()
+        self.player_board.update_player_bank_values()
+        self.player_reserved.update_player_reserved_cards()
+        self.game_bank.update_game_bank_values()
+
+    def test_selecting_card(self):
+        for card_tuples in self.market.get_all_cards():
+            card_container, card_object = card_tuples
+            card_container: ft.Container
+            card_container.data = card_object
+
+            card_container.on_click = self.test_reserve
+
+    def test_reserve(self, e):
+        card_obj = e.control.data
+        gui_functions.gui_reserve_card(self.game, card_obj)
+        self.update_all_components()
 
 
 
