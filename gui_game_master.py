@@ -24,15 +24,13 @@ class GuiGameMaster:
         self.game_bank.update_game_bank_values()
 
     def test_selecting_card(self):
-        for card_tuples in self.market.get_all_cards():
-            card_container, card_object = card_tuples
+        for card in self.market.get_all_cards():
+            card_container = card
             card_container: ft.Container
-            card_container.data = card_object
-
             card_container.on_click = self.test_reserve
 
     def test_reserve(self, e):
-        card_obj = e.control.data
+        card_obj = e.control.data.card_obj
         gui_functions.gui_reserve_card(self.game, card_obj)
         self.update_all_components()
 

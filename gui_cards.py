@@ -12,7 +12,7 @@ from gui_assets import CircleWithNum, NumWithStrokeCenter
 class GameCard:
     def __init__(self, card_obj: cards.Card):
         self.lookup = GEM_LOOKUP
-        #self.page = page
+        self.card_obj = card_obj
 
         letter = card_obj.get_dado()
         level = card_obj.get_level()
@@ -134,27 +134,12 @@ class CardMarket:
                            (2, 0), (2, 1), (2, 2), (2, 3),
                            (3, 0), (3, 1), (3, 2), (3, 3)]
 
-        self.card_1_0 = None
-        self.card_1_1 = None
-        self.card_1_2 = None
-        self.card_1_3 = None
-        self.card_2_0 = None
-        self.card_2_1 = None
-        self.card_2_2 = None
-        self.card_2_3 = None
-        self.card_3_0 = None
-        self.card_3_1 = None
-        self.card_3_2 = None
-        self.card_3_3 = None
-
-        for coord in self.coord_grid:
-            card_level, card_pos = coord
-            setattr(self, f"card_{card_level}_{card_pos}", GameCard(card_obj=self.game.get_visible_cards(card_level)[card_pos]))
 
         for coord in self.coord_grid:
             card_level, card_pos = coord
             container = getattr(self, f"grid_{card_level}_{card_pos}")
-            container.content = getattr(self, f"card_{card_level}_{card_pos}").gui_obj
+            container.data = GameCard(card_obj=self.game.get_visible_cards(card_level)[card_pos])
+            container.content = container.data.gui_obj
 
     def create_level_deck(self, level: int):
         bg_img = ft.Image(src=f"/images/level-{level}-deck.png",
@@ -169,8 +154,6 @@ class CardMarket:
 
         text = ft.Text(value=text, size=CARD_HEIGHT * .5, text_align=ft.TextAlign.CENTER, font_family="lobster", style=FILLED_WITH_STROKE)
 
-
-
         return ft.Stack(controls=[bg_img, text], alignment=ft.alignment.Alignment.CENTER)
 
 
@@ -179,13 +162,16 @@ class CardMarket:
             card_level, card_pos = coord
             visible_card_from_game: cards.Card = self.game.get_visible_cards(card_level)[card_pos]
             visible_card_cost = visible_card_from_game.get_cost()
-            grid_card: GameCard = getattr(self, f"card_{card_level}_{card_pos}")
+
+            container = getattr(self, f"grid_{card_level}_{card_pos}")
+            grid_card: GameCard
+            grid_card = container.data
             grid_card_cost = grid_card.card_cost
 
             if visible_card_cost != grid_card_cost:
                 visible_cards_from_game = self.game.get_visible_cards(card_level)
                 game_level_list = [card.get_cost() for card in visible_cards_from_game]
-                gui_level_list = [getattr(self, f"card_{card_level}_0").card_cost, getattr(self, f"card_{card_level}_1").card_cost, getattr(self, f"card_{card_level}_2").card_cost, getattr(self, f"card_{card_level}_3").card_cost]
+                gui_level_list = [getattr(self, f"grid_{card_level}_0").data.card_cost, getattr(self, f"grid_{card_level}_1").data.card_cost, getattr(self, f"grid_{card_level}_2").data.card_cost, getattr(self, f"grid_{card_level}_3").data.card_cost]
                 target_index = 0
                 for index in range(4):
                     if game_level_list[index] not in gui_level_list:
@@ -193,18 +179,18 @@ class CardMarket:
                         break
                 new_card = visible_cards_from_game[target_index]
 
-                setattr(self, f"card_{card_level}_{card_pos}", GameCard(card_obj=new_card))
+                #setattr(self, f"card_{card_level}_{card_pos}", GameCard(card_obj=new_card))
                 container = getattr(self, f"grid_{card_level}_{card_pos}")
-                container.content = getattr(self, f"card_{card_level}_{card_pos}").gui_obj
+                container.data = GameCard(card_obj=new_card)
+                container.content = container.data.gui_obj
                 container.update()
                 break
 
     def get_all_cards(self):
-        card_tuples = []
+        cards = []
         for coord in self.coord_grid:
             card_level, card_pos = coord
             card_container = getattr(self, f"grid_{card_level}_{card_pos}")
-            card_object = self.game.get_visible_cards(card_level)[card_pos]
-            card_tuples.append((card_container, card_object))
+            cards.append(card_container)
 
-        return card_tuples
+        return cards
