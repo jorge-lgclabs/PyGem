@@ -101,6 +101,10 @@ class CardMarket:
     def __init__(self,game: PyGem.GameMaster):
         self.game = game
 
+        self.grid_0_0 = ft.Container(content=None)
+        self.grid_0_1 = ft.Container(content=None)
+        self.grid_0_2 = ft.Container(content=None)
+        self.grid_0_3 = ft.Container(content=None)
         self.grid_1_0 = ft.Container(content=None)
         self.grid_1_1 = ft.Container(content=None)
         self.grid_1_2 = ft.Container(content=None)
@@ -109,37 +113,58 @@ class CardMarket:
         self.grid_2_1 = ft.Container(content=None)
         self.grid_2_2 = ft.Container(content=None)
         self.grid_2_3 = ft.Container(content=None)
-        self.grid_3_0 = ft.Container(content=None)
-        self.grid_3_1 = ft.Container(content=None)
-        self.grid_3_2 = ft.Container(content=None)
-        self.grid_3_3 = ft.Container(content=None)
 
         self.level_1_deck = self.create_level_deck(1)
         self.level_2_deck = self.create_level_deck(2)
         self.level_3_deck = self.create_level_deck(3)
 
-        self.card_market_grid = ft.GridView(expand=1,runs_count=4,max_extent=CARD_WIDTH * 1.1,child_aspect_ratio=0.8,spacing=8,run_spacing=8)
-        self.place_containers_in_grid()
-        self.initialize_market_grid()
+        self.card_market_grid = ft.GridView(expand=1,runs_count=4,max_extent=CARD_WIDTH * 1.1,child_aspect_ratio=0.8,
+                                            spacing=8,run_spacing=8, controls=
+                                            [self.level_3_deck, self.grid_2_0, self.grid_2_1, self.grid_2_2,
+                                             self.grid_2_3,
+                                             self.level_2_deck, self.grid_1_0, self.grid_1_1, self.grid_1_2,
+                                             self.grid_1_3,
+                                             self.level_1_deck, self.grid_0_0, self.grid_0_1, self.grid_0_2,
+                                             self.grid_0_3]
+                                            )
+        self.update_market_grid(first_run=True)
 
         self.gui_obj = ft.Container(content=self.card_market_grid, alignment=ft.alignment.Alignment.CENTER, width=CARD_WIDTH * 5.25)
 
-    def place_containers_in_grid(self):
-        self.card_market_grid.controls = [self.level_3_deck, self.grid_3_0, self.grid_3_1, self.grid_3_2, self.grid_3_3,
-                                          self.level_2_deck, self.grid_2_0, self.grid_2_1, self.grid_2_2, self.grid_2_3,
-                                          self.level_1_deck, self.grid_1_0, self.grid_1_1, self.grid_1_2, self.grid_1_3]
-
-    def initialize_market_grid(self):
-        self.coord_grid = [(1, 0), (1, 1), (1, 2), (1, 3),
-                           (2, 0), (2, 1), (2, 2), (2, 3),
-                           (3, 0), (3, 1), (3, 2), (3, 3)]
 
 
-        for coord in self.coord_grid:
-            card_level, card_pos = coord
-            container = getattr(self, f"grid_{card_level}_{card_pos}")
-            container.data = GameCard(card_obj=self.game.get_visible_cards(card_level)[card_pos])
-            container.content = container.data.gui_obj
+    def update_market_grid(self, first_run=False):
+        visible_card_grid_from_game = [[card for card in self.game.get_visible_cards(3)], [card for card in self.game.get_visible_cards(2)],
+                                       [card for card in self.game.get_visible_cards(1)]]
+
+        container_grid = [[self.grid_2_0, self.grid_2_1, self.grid_2_2, self.grid_2_3],
+                          [self.grid_1_0, self.grid_1_1, self.grid_1_2, self.grid_1_3],
+                          [self.grid_0_0, self.grid_0_1, self.grid_0_2, self.grid_0_3]]
+        if first_run:
+            for row in range(3):
+                for card_pos in range(4):
+                    container = container_grid[row][card_pos]
+                    visible_card_obj_from_game = visible_card_grid_from_game[row][card_pos]
+                    if container.data is None:
+                        container.data = GameCard(visible_card_obj_from_game)
+                        container.content = container.data.gui_obj
+            return
+
+        for row in range(3):
+            row_from_game = visible_card_grid_from_game[row]
+            container_row_from_gui = container_grid[row]
+            row_from_gui = [container.data.card_obj for container in container_row_from_gui]
+            if set(row_from_game) == set(row_from_gui):
+                continue
+
+            for card in row_from_game:
+                if card not in row_from_gui:
+                    new_card = card
+            for container in container_row_from_gui:
+                if container.data.card_obj not in row_from_game:
+                    container.data = GameCard(new_card)
+                    container.content = container.data.gui_obj
+            break
 
     def create_level_deck(self, level: int):
         bg_img = ft.Image(src=f"/images/level-{level}-deck.png",
@@ -156,41 +181,7 @@ class CardMarket:
 
         return ft.Stack(controls=[bg_img, text], alignment=ft.alignment.Alignment.CENTER)
 
-
-    def update_market_grid(self):
-        for coord in self.coord_grid:
-            card_level, card_pos = coord
-            visible_card_from_game: cards.Card = self.game.get_visible_cards(card_level)[card_pos]
-            visible_card_cost = visible_card_from_game.get_cost()
-
-            container = getattr(self, f"grid_{card_level}_{card_pos}")
-            grid_card: GameCard
-            grid_card = container.data
-            grid_card_cost = grid_card.card_cost
-
-            if visible_card_cost != grid_card_cost:
-                visible_cards_from_game = self.game.get_visible_cards(card_level)
-                game_level_list = [card.get_cost() for card in visible_cards_from_game]
-                gui_level_list = [getattr(self, f"grid_{card_level}_0").data.card_cost, getattr(self, f"grid_{card_level}_1").data.card_cost, getattr(self, f"grid_{card_level}_2").data.card_cost, getattr(self, f"grid_{card_level}_3").data.card_cost]
-                target_index = 0
-                for index in range(4):
-                    if game_level_list[index] not in gui_level_list:
-                        target_index = index
-                        break
-                new_card = visible_cards_from_game[target_index]
-
-                #setattr(self, f"card_{card_level}_{card_pos}", GameCard(card_obj=new_card))
-                container = getattr(self, f"grid_{card_level}_{card_pos}")
-                container.data = GameCard(card_obj=new_card)
-                container.content = container.data.gui_obj
-                container.update()
-                break
-
-    def get_all_cards(self):
-        cards = []
-        for coord in self.coord_grid:
-            card_level, card_pos = coord
-            card_container = getattr(self, f"grid_{card_level}_{card_pos}")
-            cards.append(card_container)
-
-        return cards
+    def get_all_containers(self):
+        return [[self.grid_2_0, self.grid_2_1, self.grid_2_2, self.grid_2_3],
+                [self.grid_1_0, self.grid_1_1, self.grid_1_2, self.grid_1_3],
+                [self.grid_0_0, self.grid_0_1, self.grid_0_2, self.grid_0_3]]

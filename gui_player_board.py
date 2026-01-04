@@ -1,4 +1,6 @@
 import flet as ft
+
+import cards
 import player
 
 
@@ -138,14 +140,25 @@ class PlayerReserved:
         player_reserved_list = self.player_obj.get_player_reserved()
 
         if len(player_reserved_list) > 0:
-            for card in player_reserved_list:
-                for container in self.container_row:
-                    if container.content is None:
-                        container.content = GameCard(card).gui_obj
+            cards_from_gui = []
+            for container in self.container_row:
+                if container.data is not None:
+                    if container.data.card_obj not in player_reserved_list:
+                        container.data=None
+                        container.content=None
                         container.update()
-                        break
+                    else:
+                        cards_from_gui.append(container.data.card_obj)
 
-
+            for card in player_reserved_list:
+                if card not in cards_from_gui:
+                    new_card = card
+                    for container in self.container_row:
+                        if container.data is None:
+                            container.data = GameCard(new_card)
+                            container.content =container.data.gui_obj
+                            break
+                    break
 
 
 

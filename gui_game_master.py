@@ -9,6 +9,7 @@ class GuiGameMaster:
         self.game_bank = gui_game_bank.GameBank(game)
         self.player_board = gui_player_board.PlayerBank(game.get_current_player())
         self.player_reserved = gui_player_board.PlayerReserved(game.get_current_player())
+        self.make_cards_clickable()
 
     def load_full_gui(self):
         market_and_player_board = ft.Column(controls=[self.market.gui_obj, self.player_board.gui_obj, self.player_reserved.gui_obj],
@@ -23,13 +24,13 @@ class GuiGameMaster:
         self.player_reserved.update_player_reserved_cards()
         self.game_bank.update_game_bank_values()
 
-    def test_selecting_card(self):
-        for card in self.market.get_all_cards():
-            card_container = card
-            card_container: ft.Container
-            card_container.on_click = self.test_reserve
+    def make_cards_clickable(self):
+        for row in self.market.get_all_containers():
+            for card in row:
+                card_container = card
+                card_container.on_click = self.card_click_handler
 
-    def test_reserve(self, e):
+    def card_click_handler(self, e):
         card_obj = e.control.data.card_obj
         gui_functions.gui_reserve_card(self.game, card_obj)
         self.update_all_components()
