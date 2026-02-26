@@ -7,22 +7,35 @@ class GuiGameMaster:
         self.game = game
         self.market = gui_cards.CardMarket(game)
         self.game_bank = gui_game_bank.GameBank(game)
-        self.player_board = gui_player_board.PlayerBank(game.get_current_player())
-        self.player_reserved = gui_player_board.PlayerReserved(game.get_current_player())
+        self.gui_players = [gui_player_board.GuiPlayer(player) for player in game._players]
         self.make_cards_clickable()
+        #self.refresh_player_board()
 
-    def load_full_gui(self):
-        market_and_player_board = ft.Column(controls=[self.market.gui_obj, self.player_board.gui_obj, self.player_reserved.gui_obj],
+    def load_initial_gui(self):
+        self.market_and_player_board = ft.Column(controls=[self.market.gui_obj],
                                             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                                             alignment=ft.MainAxisAlignment.CENTER)
-        return ft.Row(controls=[market_and_player_board, self.game_bank.gui_obj], spacing=30,
+        for player in self.gui_players:
+            if self.game.get_current_player() == player.player_obj:
+                current_player = player
+
+        self.market_and_player_board.controls.append(current_player.player_bank.gui_obj)
+        self.market_and_player_board.controls.append(current_player.player_reserved.gui_obj)
+
+        return ft.Row(controls=[self.market_and_player_board, self.game_bank.gui_obj], spacing=30,
                         vertical_alignment=ft.CrossAxisAlignment.CENTER, alignment=ft.MainAxisAlignment.CENTER)
+
+    def refresh_player_board(self):
+        for player in self.gui_players:
+            if self.game.get_current_player() == player.player_obj:
+                current_player = player
+        current_player.player_reserved.update_player_reserved_cards()
+        current_player.player_bank.update_player_bank_values()
 
     def update_all_components(self):
         self.market.update_market_grid()
-        self.player_board.update_player_bank_values()
-        self.player_reserved.update_player_reserved_cards()
         self.game_bank.update_game_bank_values()
+        self.refresh_player_board()
 
     def make_cards_clickable(self):
         for row in self.market.get_all_containers():

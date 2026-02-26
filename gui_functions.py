@@ -5,7 +5,6 @@ from cards import Card
 
 def gui_reserve_card(game: GameMaster, card_to_reserve: Card):
 
-
     player = game.get_current_player()
 
     # mechanism with simulates the player taking the card and placing it in their reserve pile
@@ -17,5 +16,4 @@ def gui_reserve_card(game: GameMaster, card_to_reserve: Card):
     # taking a gold token
     game._bank.withdraw('gold')
     player.deposit_bank('gold')
-    game.end_turn(("reserved card " + str(card_to_reserve)))
-    return
+    return "reserved card " + str(card_to_reserve)

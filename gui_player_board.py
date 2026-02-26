@@ -160,6 +160,12 @@ class PlayerReserved:
                             break
                     break
 
+class GuiPlayer:
+    def __init__(self, player_obj: player.Player):
+        self.player_obj = player_obj
+        self.player_bank = PlayerBank(self.player_obj)
+        self.player_reserved = PlayerReserved(self.player_obj)
+
 
 
 
