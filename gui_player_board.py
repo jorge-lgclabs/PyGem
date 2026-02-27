@@ -7,7 +7,7 @@ import player
 from gui_assets import GEM_LOOKUP, RED_GEM, WHITE_GEM, BLUE_GEM, GREEN_GEM, NOIR_GEM, GOLD_COIN
 from gui_assets import CARD_HEIGHT, CARD_WIDTH
 from gui_assets import PLAYER_BANK_CELL_SIZE, PLAYER_BANK_HEIGHT, PLAYER_BANK_WIDTH, PLAYER_BANK_ROUNDING_RADIUS, SHADE_OPACITY
-from gui_assets import CircleWithNum, NumWithStrokeCenter
+from gui_assets import CircleWithNum, NumWithStrokeCenter, FILLED_WITH_STROKE
 from gui_cards import GameCard
 
 
@@ -165,6 +165,7 @@ class GuiPlayer:
         self.player_obj = player_obj
         self.player_bank = PlayerBank(self.player_obj)
         self.player_reserved = PlayerReserved(self.player_obj)
+        self.player_label = ft.Text(value=f"Current player: {self.player_obj._player_name}", size=30, style=FILLED_WITH_STROKE, text_align=ft.TextAlign.CENTER)
 
 
 

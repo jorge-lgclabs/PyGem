@@ -41,6 +41,7 @@ BG_BLACK = ft.Colors.BLACK38
 
 
 FILLED_WITH_STROKE = ft.TextStyle(
+    font_family='lobster',
     weight=ft.FontWeight.BOLD,
     foreground=ft.Paint(  # paint fill explicitly
         style=ft.PaintingStyle.FILL,
