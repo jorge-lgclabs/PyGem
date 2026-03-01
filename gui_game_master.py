@@ -12,7 +12,7 @@ class GuiGameMaster:
         self.game = game
         self.market = gui_cards.CardMarket(game)
         self.game_bank = gui_game_bank.GameBank(game)
-        self.user_column = gui_user_column.UserColumn(game)
+        self.user_column = gui_user_column.UserColumn(game, self.go_back_from_move, self.end_turn_change_player)
         self.gui_players = [gui_player_board.GuiPlayer(player) for player in game._players]
         self.update_current_gui_player()
         self.last_move = ''
@@ -27,6 +27,8 @@ class GuiGameMaster:
         self.current_player.player_obj.deposit_bank('white')
 
         gui_functions.make_cards_clickable(self.market.get_all_containers(), self.card_click_handler)
+
+        # not meant to be done at the outset, only here for testing purposes
         gui_functions.highlight_buyable_cards(self.market.get_all_containers(), self.current_player)
 
 
@@ -53,6 +55,13 @@ class GuiGameMaster:
         self.game_bank.update_game_bank_values()
         self.user_column.update_user_column()
 
+    def go_back_from_move(self, e):
+        gui_functions.make_cards_clickable(self.market.get_all_containers(), self.card_click_handler)
+        gui_functions.highlight_buyable_cards(self.market.get_all_containers(), self.current_player)
+        self.market.update_market_grid()
+        self.user_column.initial_message()
+        self.user_column.update_user_column()
+
     def end_turn_change_player(self):
         self.game.end_turn(self.last_move)
         self.update_current_gui_player()
@@ -70,21 +79,30 @@ class GuiGameMaster:
         self.refresh_gui()
 
     def card_click_handler(self, e):
+        gui_functions.make_cards_unclickable(self.market.get_all_containers())
+        gui_functions.unhighlight_all_cards(self.market.get_all_containers())
+        #self.market.update_market_grid()
         card_container = e.control
-        card_obj: cards.Card = card_container.data.card_obj
-        #self.last_move = gui_functions.gui_reserve_card(self.game, card_obj)
-        self.user_column.gui_obj.content.controls.insert(0, card_container)
 
-
-
-
-        if gui_functions.gui_can_afford(card_obj, self.current_player):
-            print('can afford')
+        if gui_functions.gui_can_afford(card_container.data.card_obj, self.current_player):
+            response = self.user_column.reserve_or_buy_card(card_container)
         else:
-            print('cannot afford')
+            response = self.user_column.reserve_card_only(card_container)
 
-        self.user_column.user_message.value='this card?'
-        self.user_column.commit_button.visible=True
+        # if response == 'back':  # user backs out of move
+        #     self.user_column.initial_message()
+        #     self.user_column.update_user_column()
+        #     return
+        # else:
+        #     self.last_move = response  # self.last_move = gui_functions.gui_reserve_card(self.game, card_obj)
+
+
+
+
+        #self.user_column.user_message.value='this card?'
+        #self.user_column.commit_button.visible=True
+
+
         self.refresh_gui()
 
 

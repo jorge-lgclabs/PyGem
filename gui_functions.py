@@ -5,10 +5,9 @@ import cards
 import gui_player_board
 from gui_assets import CARD_ROUNDING_RADIUS
 from PyGem import GameMaster
-from cards import Card
 
-def gui_reserve_card(game: GameMaster, card_to_reserve: Card):
-
+def gui_reserve_card(e):
+    card_to_reserve, game, end_turn = e.control.data
     player = game.get_current_player()
 
     # mechanism with simulates the player taking the card and placing it in their reserve pile
@@ -20,7 +19,8 @@ def gui_reserve_card(game: GameMaster, card_to_reserve: Card):
     # taking a gold token
     game._bank.withdraw('gold')
     player.deposit_bank('gold')
-    return "reserved card " + str(card_to_reserve)
+
+    end_turn("reserved card " + str(card_to_reserve))
 
 def gui_can_afford(card_obj: cards.Card, gui_player: gui_player_board.GuiPlayer):
     return card_obj.can_afford(gui_player.player_obj.get_player_tender())
@@ -43,6 +43,16 @@ def unhighlight_all_cards(market_containers):
 
 def make_cards_clickable(market_containers, handler_func):
     for row in market_containers:
-        for card in row:
-            card_container = card
+        for card_container in row:
             card_container.on_click = handler_func
+            print(card_container.data.card_obj)
+            if card_container.parent is not None:
+                print(card_container.disabled)
+                card_container.update()
+
+
+def make_cards_unclickable(market_containers):
+    for row in market_containers:
+        for card_container in row:
+            card_container.on_click = None
+            card_container.update()
