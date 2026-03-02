@@ -10,26 +10,35 @@ from gui_assets import CARD_ROUNDING_RADIUS
 class GuiGameMaster:
     def __init__(self, game: GameMaster):
         self.game = game
+        self.gui_players = [gui_player_board.GuiPlayer(player) for player in game._players]
+        self.update_current_gui_player()
+        self.test_moves()
         self.market = gui_cards.CardMarket(game)
         self.game_bank = gui_game_bank.GameBank(game)
         self.user_column = gui_user_column.UserColumn(game, self.go_back_from_move, self.end_turn_change_player, self.refresh_gui)
-        self.gui_players = [gui_player_board.GuiPlayer(player) for player in game._players]
-        self.update_current_gui_player()
-        self.last_move = ''
 
-        # testing bank
-        self.current_player.player_obj.deposit_bank('red')
-        self.current_player.player_obj.deposit_bank('red')
-        self.current_player.player_obj.deposit_bank('red')
-        self.current_player.player_obj.deposit_bank('blue')
-        self.current_player.player_obj.deposit_bank('blue')
-        self.current_player.player_obj.deposit_bank('green')
-        self.current_player.player_obj.deposit_bank('white')
+        self.last_move = ''
 
         gui_functions.make_cards_clickable(self.market.get_all_containers(), self.card_click_handler)
 
         # not meant to be done at the outset, only here for testing purposes
         gui_functions.highlight_buyable_cards(self.market.get_all_containers(), self.current_player)
+        self.current_player.player_bank.update_player_bank_values()
+
+    def test_moves(self):
+        # testing bank
+        for _ in range(3):
+            self.game._bank.withdraw('red')
+            self.current_player.player_obj.deposit_bank('red')
+
+        for _ in range(2):
+            self.game._bank.withdraw('blue')
+            self.current_player.player_obj.deposit_bank('blue')
+
+        self.game._bank.withdraw('green')
+        self.current_player.player_obj.deposit_bank('green')
+        self.game._bank.withdraw('white')
+        self.current_player.player_obj.deposit_bank('white')
 
 
     def update_current_gui_player(self):
