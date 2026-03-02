@@ -275,39 +275,40 @@ class GameMaster:
         return result
 
 
-    def buy_card(self, player=None):
+    def buy_card(self, player=None, is_gui=False, incoming_card_obj=None):
         """Method representing the in-game action of a player buying a card. In Splendor a player can buy a card if they have enough tokens and/or dado to pay its price, they then take the card from the table and place it in their hand"""
         if player is None:  # for the sake of the GUI implementation can call without getting current player
             player = self.get_current_player()
 
-        available_cards = []
-        player_tender = player.get_player_tender()
+        if not is_gui: # all the old original command line code goes here
+            available_cards = []
+            player_tender = player.get_player_tender()
 
-        # iterate through every card and filter it down to only those cards the player can afford
-        for row in range (1,4):
-            available_cards += [card for card in self.get_visible_cards(row) if card.can_afford(player_tender)]
+            # iterate through every card and filter it down to only those cards the player can afford
+            for row in range (1,4):
+                available_cards += [card for card in self.get_visible_cards(row) if card.can_afford(player_tender)]
 
-        # add any cards the player has reserved that they can afford
-        available_cards += [card for card in player.get_player_reserved() if card.can_afford(player_tender)]
+            # add any cards the player has reserved that they can afford
+            available_cards += [card for card in player.get_player_reserved() if card.can_afford(player_tender)]
 
-        if self._is_gui is True:
-            return available_cards  # exit point where the code diverges for the GUI version
-
-        # get the card from player
-        found = False
-        while not found:
-            card_to_buy = self.prompt_user(("Which card would you like to buy?: " + str([card.get_cost() for card in available_cards]) + "(or 'back' to start turn again): "), 'card')
-            if card_to_buy == 'back':
-                return 'back'
-            for card in available_cards:
-                if card.get_cost() == card_to_buy:
-                    card_to_buy = card # here the string entered by the user is being transmutated into the Card object itself of that card
-                    found = True
+            # get the card from player
+            found = False
+            while not found:
+                card_to_buy = self.prompt_user(("Which card would you like to buy?: " + str([card.get_cost() for card in available_cards]) + "(or 'back' to start turn again): "), 'card')
+                if card_to_buy == 'back':
+                    return 'back'
+                for card in available_cards:
+                    if card.get_cost() == card_to_buy:
+                        card_to_buy = card # here the string entered by the user is being transmutated into the Card object itself of that card
+                        found = True
+                        break
+                if found:
                     break
-            if found:
-                break
-            # this only executes if the card was not found among available_cards
-            print("That card is not purchasable, please try again")
+                # this only executes if the card was not found among available_cards
+                print("That card is not purchasable, please try again")
+        else: # this is gui_specific code
+            card_to_buy = incoming_card_obj
+
 
         # at this point the card_to_buy should contain a card that is fully valid for player to buy
 
@@ -361,7 +362,10 @@ class GameMaster:
                         player.withdraw(color)
                         self._bank.deposit(color)
 
-        self.end_turn(("bought card " + str(card_to_buy)))
+        if not is_gui: # original command line ending to this function
+            self.end_turn(("bought card " + str(card_to_buy)))
+        else: # for gui
+            return "bought card" + str(card_to_buy)
 
     def reserve_card(self, player=None):
         """Method representing the in-game action of a player reserving a card, receives a Player object and allows that player to reserve any visible Card or the next_card of any row and receive a gold token"""

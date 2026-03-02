@@ -13,7 +13,7 @@ class UserColumn:
         self.refresh_gui = refresh_gui_func
         self.end_turn_button = ft.Button(content='End Turn', on_click=end_turn_func)
         self.back_button = ft.Button(content='Go Back', on_click = back_func)
-        self.buy_button = ft.Button(content='Buy Card', on_click = gui_functions.gui_reserve_card)
+        self.buy_button = ft.Button(content='Buy Card', on_click = gui_functions.gui_buy_card)
         self.reserve_button = ft.Button(content='Reserve Card', on_click = gui_functions.gui_reserve_card)
         #self.user_message = ft.Text(text_align=ft.TextAlign.CENTER)
         self.gui_obj = ft.Container(width = 155, height = 450, content=ft.Column(
