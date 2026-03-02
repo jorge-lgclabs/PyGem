@@ -12,7 +12,7 @@ def gui(page: ft.Page):
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
     # page.window.height = 870
     # page.window.width = 1020
-    #page.window.maximized=True
+    page.window.maximized=True
 
     game = GameMaster(['Jorge', 'Alejandra'])
     gui_game = GuiGameMaster(game)

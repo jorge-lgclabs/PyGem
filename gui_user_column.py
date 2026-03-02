@@ -1,15 +1,15 @@
 # column on the left side of the card market/player board which serves as the space for messages to the user and various
 # buttons like the "commit button" which commits the turn for the user and switches to the next user
 import flet as ft
-import copy
 
 import gui_cards
 import gui_functions
 
 
 class UserColumn:
-    def __init__(self, game, back_func, end_turn_func):
+    def __init__(self, game, back_func, end_turn_func, refresh_gui_func):
         self.game = game
+        self.refresh_gui = refresh_gui_func
         self.end_turn_button = ft.Button(content='End Turn', on_click=end_turn_func)
         self.back_button = ft.Button(content='Go Back', on_click = back_func)
         self.buy_button = ft.Button(content='Buy Card')
@@ -17,7 +17,7 @@ class UserColumn:
         self.user_message = ft.Text(text_align=ft.TextAlign.CENTER)
         self.gui_obj = ft.Container(width = 155, height = 350, content=ft.Column(controls=[self.user_message],
                                     horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                                    alignment=ft.MainAxisAlignment.SPACE_BETWEEN, intrinsic_width=True))
+                                    alignment=ft.MainAxisAlignment.SPACE_EVENLY, intrinsic_width=True))
         self.initial_message()
 
     def update_user_column(self):
@@ -50,8 +50,9 @@ class UserColumn:
         self.gui_obj.content.controls.insert(0, card_container)
 
     def ready_to_end_turn(self, last_move):
+        self.refresh_gui()
+        self.end_turn_button.data = last_move
         self.gui_obj.content.controls = [
             ft.Text('End turn to move on to next player', text_align=ft.TextAlign.CENTER),
             self.end_turn_button
         ]
-        print(last_move)

@@ -12,7 +12,7 @@ class GuiGameMaster:
         self.game = game
         self.market = gui_cards.CardMarket(game)
         self.game_bank = gui_game_bank.GameBank(game)
-        self.user_column = gui_user_column.UserColumn(game, self.go_back_from_move, self.end_turn_change_player)
+        self.user_column = gui_user_column.UserColumn(game, self.go_back_from_move, self.end_turn_change_player, self.refresh_gui)
         self.gui_players = [gui_player_board.GuiPlayer(player) for player in game._players]
         self.update_current_gui_player()
         self.last_move = ''
@@ -63,9 +63,9 @@ class GuiGameMaster:
         self.user_column.initial_message()
         self.user_column.update_user_column()
 
-    def end_turn_change_player(self, last_move):
-        print(last_move)
-        #self.game.end_turn(self.last_move)
+    def end_turn_change_player(self, e):
+        self.last_move = e.control.data
+        self.game.end_turn(self.last_move)
         self.update_current_gui_player()
 
         for _ in range(3):
@@ -77,8 +77,10 @@ class GuiGameMaster:
 
         gui_functions.unhighlight_all_cards(self.market.get_all_containers())
         gui_functions.highlight_buyable_cards(self.market.get_all_containers(), self.current_player)
+        gui_functions.make_cards_clickable(self.market.get_all_containers(), self.card_click_handler)
 
         self.refresh_gui()
+        self.user_column.initial_message()
 
     def card_click_handler(self, e):
         gui_functions.make_cards_unclickable(self.market.get_all_containers())
@@ -87,9 +89,9 @@ class GuiGameMaster:
         card_container = e.control
 
         if gui_functions.gui_can_afford(card_container.data.card_obj, self.current_player):
-            response = self.user_column.reserve_or_buy_card(card_container.data.card_obj)
+            self.user_column.reserve_or_buy_card(card_container.data.card_obj)
         else:
-            response = self.user_column.reserve_card_only(card_container.data.card_obj)
+            self.user_column.reserve_card_only(card_container.data.card_obj)
 
         # if response == 'back':  # user backs out of move
         #     self.user_column.initial_message()
