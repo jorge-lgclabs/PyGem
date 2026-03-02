@@ -1,6 +1,7 @@
 # column on the left side of the card market/player board which serves as the space for messages to the user and various
 # buttons like the "commit button" which commits the turn for the user and switches to the next user
 import flet as ft
+import copy
 
 import gui_cards
 import gui_functions
@@ -29,11 +30,13 @@ class UserColumn:
 
 
 
-    def reserve_card_only(self, card_container):
-        card_obj = card_container.data.card_obj
+    def reserve_card_only(self, card_obj):
+
+        display_card = gui_cards.GameCard(card_obj)
+
         # a tuple that contains the 2 args for the event handler [0] and [1], plus an event handler [2]
         event_payload = (card_obj, self.game, self.ready_to_end_turn)  # to be called by on_click handler
-        self.gui_obj.content.controls.insert(0, card_container)
+        self.gui_obj.content.controls.insert(0, display_card.gui_obj)
         self.gui_obj.content.controls.append(self.reserve_button)
         self.gui_obj.content.controls.append(ft.Text('or', text_align=ft.TextAlign.CENTER))
         self.gui_obj.content.controls.append(self.back_button)

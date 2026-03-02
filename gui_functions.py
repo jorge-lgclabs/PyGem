@@ -45,9 +45,7 @@ def make_cards_clickable(market_containers, handler_func):
     for row in market_containers:
         for card_container in row:
             card_container.on_click = handler_func
-            print(card_container.data.card_obj)
             if card_container.parent is not None:
-                print(card_container.disabled)
                 card_container.update()
 
 

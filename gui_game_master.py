@@ -56,14 +56,16 @@ class GuiGameMaster:
         self.user_column.update_user_column()
 
     def go_back_from_move(self, e):
+        e.control.parent.controls.clear()
         gui_functions.make_cards_clickable(self.market.get_all_containers(), self.card_click_handler)
         gui_functions.highlight_buyable_cards(self.market.get_all_containers(), self.current_player)
         self.market.update_market_grid()
         self.user_column.initial_message()
         self.user_column.update_user_column()
 
-    def end_turn_change_player(self):
-        self.game.end_turn(self.last_move)
+    def end_turn_change_player(self, last_move):
+        print(last_move)
+        #self.game.end_turn(self.last_move)
         self.update_current_gui_player()
 
         for _ in range(3):
@@ -85,9 +87,9 @@ class GuiGameMaster:
         card_container = e.control
 
         if gui_functions.gui_can_afford(card_container.data.card_obj, self.current_player):
-            response = self.user_column.reserve_or_buy_card(card_container)
+            response = self.user_column.reserve_or_buy_card(card_container.data.card_obj)
         else:
-            response = self.user_column.reserve_card_only(card_container)
+            response = self.user_column.reserve_card_only(card_container.data.card_obj)
 
         # if response == 'back':  # user backs out of move
         #     self.user_column.initial_message()
