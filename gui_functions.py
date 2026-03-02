@@ -22,6 +22,12 @@ def gui_reserve_card(e):
 
     ready_end_turn("reserved card " + str(card_to_reserve))
 
+def gui_buy_card(e):
+    card_to_reserve, game, ready_end_turn = e.control.data
+    player = game.get_current_player()
+
+
+
 def gui_can_afford(card_obj: cards.Card, gui_player: gui_player_board.GuiPlayer):
     return card_obj.can_afford(gui_player.player_obj.get_player_tender())
 

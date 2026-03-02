@@ -2,6 +2,7 @@
 # buttons like the "commit button" which commits the turn for the user and switches to the next user
 import flet as ft
 
+import cards
 import gui_cards
 import gui_functions
 
@@ -12,10 +13,10 @@ class UserColumn:
         self.refresh_gui = refresh_gui_func
         self.end_turn_button = ft.Button(content='End Turn', on_click=end_turn_func)
         self.back_button = ft.Button(content='Go Back', on_click = back_func)
-        self.buy_button = ft.Button(content='Buy Card')
-        self.reserve_button = ft.Button(content='Reserve Card')
-        self.user_message = ft.Text(text_align=ft.TextAlign.CENTER)
-        self.gui_obj = ft.Container(width = 155, height = 350, content=ft.Column(controls=[self.user_message],
+        self.buy_button = ft.Button(content='Buy Card', on_click = gui_functions.gui_reserve_card)
+        self.reserve_button = ft.Button(content='Reserve Card', on_click = gui_functions.gui_reserve_card)
+        #self.user_message = ft.Text(text_align=ft.TextAlign.CENTER)
+        self.gui_obj = ft.Container(width = 155, height = 450, content=ft.Column(
                                     horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                                     alignment=ft.MainAxisAlignment.SPACE_EVENLY, intrinsic_width=True))
         self.initial_message()
@@ -24,30 +25,30 @@ class UserColumn:
         self.gui_obj.update()
 
     def initial_message(self):
-        self.gui_obj.content.controls = [self.user_message]
-        self.user_message.value = ('Click any card to reserve or buy (if you can afford it)\nor'
-                                   '\nClick any gem in the bank to begin gem taking action')
+        self.gui_obj.content.controls = ft.Text(value=('Click any card to reserve or buy (if you can afford it)\nor'
+                                   '\nClick any gem in the bank to begin gem taking action'), text_align=ft.TextAlign.CENTER)
 
-
-
-    def reserve_card_only(self, card_obj):
+    def reserve_or_buy_card(self, card_obj:cards.Card, can_buy: bool):
 
         display_card = gui_cards.GameCard(card_obj)
 
         # a tuple that contains the 2 args for the event handler [0] and [1], plus an event handler [2]
         event_payload = (card_obj, self.game, self.ready_to_end_turn)  # to be called by on_click handler
-        self.gui_obj.content.controls.insert(0, display_card.gui_obj)
-        self.gui_obj.content.controls.append(self.reserve_button)
-        self.gui_obj.content.controls.append(ft.Text('or', text_align=ft.TextAlign.CENTER))
-        self.gui_obj.content.controls.append(self.back_button)
+        self.reserve_button.data = event_payload  # "tucking" payload into the control so it can be used by the handler
 
-        self.user_message.value = "Reserve card and receive one gold"
-        self.reserve_button.data = event_payload # "tucking" payload into the control so it can be used by the handler
-        self.reserve_button.on_click = gui_functions.gui_reserve_card
+        self.gui_obj.content.controls = [
+            display_card.gui_obj,
+            ft.Text('Reserve card and receive one gold', text_align=ft.TextAlign.CENTER),
+            self.reserve_button,
+            ft.Text('or', text_align=ft.TextAlign.CENTER),
+            self.back_button
+        ]
 
-    def reserve_or_buy_card(self, card_container):
-        card_obj = card_container.data.card_obj
-        self.gui_obj.content.controls.insert(0, card_container)
+        if can_buy:
+            self.gui_obj.content.controls.insert(3, ft.Text('or', text_align=ft.TextAlign.CENTER))
+            self.gui_obj.content.controls.insert(4, ft.Text(f'Buy card for {card_obj.get_cost()} and receive one {card_obj.get_dado()} dado', text_align=ft.TextAlign.CENTER))
+            self.gui_obj.content.controls.insert(5, self.buy_button)
+            self.buy_button.data = event_payload
 
     def ready_to_end_turn(self, last_move):
         self.refresh_gui()

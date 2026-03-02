@@ -16,10 +16,7 @@ class GuiGameMaster:
         self.market = gui_cards.CardMarket(game)
         self.game_bank = gui_game_bank.GameBank(game)
         self.user_column = gui_user_column.UserColumn(game, self.go_back_from_move, self.end_turn_change_player, self.refresh_gui)
-
         self.last_move = ''
-
-        gui_functions.make_cards_clickable(self.market.get_all_containers(), self.card_click_handler)
 
         # not meant to be done at the outset, only here for testing purposes
         gui_functions.highlight_buyable_cards(self.market.get_all_containers(), self.current_player)
@@ -53,6 +50,7 @@ class GuiGameMaster:
             self.current_player.player_bank.gui_obj,
             self.current_player.player_reserved.gui_obj
         ], horizontal_alignment=ft.CrossAxisAlignment.CENTER, alignment=ft.MainAxisAlignment.CENTER)
+        gui_functions.make_cards_clickable(self.market.get_all_containers(), self.card_click_handler)
 
         return ft.Row(controls=[self.user_column.gui_obj, self.market_and_player_board, self.game_bank.gui_obj], spacing=30,
                         vertical_alignment=ft.CrossAxisAlignment.CENTER, alignment=ft.MainAxisAlignment.CENTER)
@@ -98,9 +96,9 @@ class GuiGameMaster:
         card_container = e.control
 
         if gui_functions.gui_can_afford(card_container.data.card_obj, self.current_player):
-            self.user_column.reserve_or_buy_card(card_container.data.card_obj)
+            self.user_column.reserve_or_buy_card(card_container.data.card_obj, can_buy=True)
         else:
-            self.user_column.reserve_card_only(card_container.data.card_obj)
+            self.user_column.reserve_or_buy_card(card_container.data.card_obj, can_buy=False)
 
         # if response == 'back':  # user backs out of move
         #     self.user_column.initial_message()
