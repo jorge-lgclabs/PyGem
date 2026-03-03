@@ -367,7 +367,7 @@ class GameMaster:
         else: # for gui
             return "bought card" + str(card_to_buy)
 
-    def reserve_card(self, player=None):
+    def reserve_card(self, player=None, is_gui=False, incoming_card=None):
         """Method representing the in-game action of a player reserving a card, receives a Player object and allows that player to reserve any visible Card or the next_card of any row and receive a gold token"""
         # all visible cards are available
         available_cards = self.get_visible_cards(1) + self.get_visible_cards(2) + self.get_visible_cards(3)
@@ -375,36 +375,41 @@ class GameMaster:
         if player is None:  # for the sake of the GUI implementation can call without getting current player
             player = self.get_current_player()
 
-        # The unique input needs of this function require using a custom user prompt rather than using the prompt_user method, combining the 'card' requirement with the numbers [1,2,3]
-        while True:
-            card_to_reserve = input(f"Which card would you like to reserve? the top of the deck for row [1, 2, 3] or {str([card.get_cost() for card in available_cards])}  (or 'back' to start turn again): ")
-            if card_to_reserve == 'back':
-                return 'back'
-            if len(card_to_reserve) == 1 and card_to_reserve in ['1','2','3']:
-                break
-            else:
-                for index, char in enumerate(['w', 0, 'b', 0, 'g', 0, 'r', 0, 'n', 0]):
-                    if type(char) == str:
-                        if char != card_to_reserve[index]:
+        if not is_gui:  # all the original command line code goes here
+
+            # The unique input needs of this function require using a custom user prompt rather than using the prompt_user method, combining the 'card' requirement with the numbers [1,2,3]
+            while True:
+                card_to_reserve = input(f"Which card would you like to reserve? the top of the deck for row [1, 2, 3] or {str([card.get_cost() for card in available_cards])}  (or 'back' to start turn again): ")
+                if card_to_reserve == 'back':
+                    return 'back'
+                if len(card_to_reserve) == 1 and card_to_reserve in ['1','2','3']:
+                    break
+                else:
+                    for index, char in enumerate(['w', 0, 'b', 0, 'g', 0, 'r', 0, 'n', 0]):
+                        if type(char) == str:
+                            if char != card_to_reserve[index]:
+                                print("Please enter a valid value (1,2,3 or a card)")
+                                return self.reserve_card(player)
+                        if char == 0 and int(card_to_reserve[index]) not in range(0, 8):
                             print("Please enter a valid value (1,2,3 or a card)")
                             return self.reserve_card(player)
-                    if char == 0 and int(card_to_reserve[index]) not in range(0, 8):
-                        print("Please enter a valid value (1,2,3 or a card)")
-                        return self.reserve_card(player)
-        # if the code has reached this part, it is a valid input
-            break
-        if len(card_to_reserve) > 1:
-            valid = False
-            for card in available_cards:  # determine whether the requested card is a valid card
-                if card.get_cost() == card_to_reserve:
-                    card_to_reserve = card  # here the string entered by the user is being transmutated into the Card object itself of that card
-                    valid = True
-                    break
-            if not valid:
-                print("That card is not available to reserve, please try again") # if the code reaches here, that means the card was not valid
-                return self.reserve_card(player)
+            # if the code has reached this part, it is a valid input
+                break
+            if len(card_to_reserve) > 1:
+                valid = False
+                for card in available_cards:  # determine whether the requested card is a valid card
+                    if card.get_cost() == card_to_reserve:
+                        card_to_reserve = card  # here the string entered by the user is being transmutated into the Card object itself of that card
+                        valid = True
+                        break
+                if not valid:
+                    print("That card is not available to reserve, please try again") # if the code reaches here, that means the card was not valid
+                    return self.reserve_card(player)
 
-        # if the code has reached this part, it is a valid action
+            # if the code has reached this part, it is a valid action
+        else:  # gui-specific code
+            card_to_reserve = incoming_card
+
 
         # if the input was a number (simulates the player reserving the top face-down card of that row's deck)
         if type(card_to_reserve) == str:
@@ -420,8 +425,11 @@ class GameMaster:
         # taking a gold token
         self._bank.withdraw('gold')
         player.deposit_bank('gold')
-        self.end_turn(("reserved card " + str(card_to_reserve)))
-        return
+
+        if not is_gui:  # original command line ending to this function
+            self.end_turn(("reserved card " + str(card_to_reserve)))
+        else: # gui-specific ending
+            return "reserved card " + str(card_to_reserve)
 
     def get_current_player(self) -> Player:
         """Returns the current player"""
