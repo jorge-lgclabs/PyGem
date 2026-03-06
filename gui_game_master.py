@@ -66,6 +66,7 @@ class GuiGameMaster:
         e.control.parent.controls.clear()
         gui_functions.make_cards_clickable(self.market.get_all_containers(), self.card_click_handler)
         gui_functions.highlight_buyable_cards(self.market.get_all_containers(), self.current_player)
+        gui_functions.highlight_and_make_clickable_reserved_cards(self.current_player.get_buyable_reserved_containers(), self.card_click_handler)
         self.market.update_market_grid()
         self.user_column.initial_message()
         self.user_column.update_user_column()
@@ -82,9 +83,11 @@ class GuiGameMaster:
         self.market_and_player_board.controls.append(self.current_player.player_bank.gui_obj)
         self.market_and_player_board.controls.append(self.current_player.player_reserved.gui_obj)
 
+        gui_functions.unhighlight_and_make_unclickable_reserved_cards(self.current_player.get_buyable_reserved_containers())
         gui_functions.unhighlight_all_cards(self.market.get_all_containers())
         gui_functions.highlight_buyable_cards(self.market.get_all_containers(), self.current_player)
         gui_functions.make_cards_clickable(self.market.get_all_containers(), self.card_click_handler)
+        gui_functions.highlight_and_make_clickable_reserved_cards(self.current_player.get_buyable_reserved_containers(), self.card_click_handler)
 
         self.refresh_gui()
         self.user_column.initial_message()
@@ -92,6 +95,7 @@ class GuiGameMaster:
     def card_click_handler(self, e):
         gui_functions.make_cards_unclickable(self.market.get_all_containers())
         gui_functions.unhighlight_all_cards(self.market.get_all_containers())
+        gui_functions.unhighlight_and_make_unclickable_reserved_cards(self.current_player.get_buyable_reserved_containers())
 
         container_data = e.control.data
 

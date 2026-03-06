@@ -167,6 +167,17 @@ class GuiPlayer:
         self.player_reserved = PlayerReserved(self.player_obj)
         self.player_label = ft.Text(value=f"Current player: {self.player_obj._player_name}", size=30, style=FILLED_WITH_STROKE, text_align=ft.TextAlign.CENTER)
 
+    def get_buyable_reserved_containers(self):
+        reserved_containers = []
+        for container in self.player_reserved.container_row:
+            if container.data is not None:
+                card_obj: cards.Card = container.data.card_obj
+                tender = self.player_obj.get_player_tender()
+                if card_obj.can_afford(tender):
+                    reserved_containers.append(container)
+
+        return reserved_containers
+
 
 
 

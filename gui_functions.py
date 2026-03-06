@@ -53,3 +53,14 @@ def make_cards_unclickable(market_containers):
         for card_container in row:
             card_container.on_click = None
             card_container.update()
+
+def highlight_and_make_clickable_reserved_cards(reserved_containers, handler_func):
+    for card_container in reserved_containers:
+        card_container.on_click = handler_func
+        card_container.border = ft.border.all(3, ft.Colors.GREEN_500)
+        card_container.border_radius = CARD_ROUNDING_RADIUS
+
+def unhighlight_and_make_unclickable_reserved_cards(reserved_containers):
+    for card_container in reserved_containers:
+        card_container.on_click = None
+        card_container.border = None

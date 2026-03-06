@@ -65,7 +65,9 @@ class UserColumn:
 
         # now conditionally make elements invisible based on available moves
         index_to_be_invisible = []
-        if len(self.game.get_current_player().get_player_reserved()) == 3:  # if player has reserved the max # of cards
+        current_reserved = self.game.get_current_player().get_player_reserved()
+        # if player has reserved the max # of cards or is trying to buy an already reserved card
+        if len(current_reserved) == 3 or card_obj in current_reserved:
             index_to_be_invisible.extend([0,1,2,3])
 
         if not can_buy:  # if player cannot buy card
