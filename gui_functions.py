@@ -13,10 +13,10 @@ def gui_reserve_card(e):
     ready_end_turn(game.reserve_card(player=player, is_gui=True, incoming_card=card_to_reserve))
 
 def gui_buy_card(e):
-    card_to_reserve, game, ready_end_turn = e.control.data
+    card_to_buy, game, ready_end_turn = e.control.data
     player = game.get_current_player()
 
-    ready_end_turn(game.buy_card(player=player, is_gui=True, incoming_card_obj=card_to_reserve))
+    ready_end_turn(game.buy_card(player=player, is_gui=True, incoming_card_obj=card_to_buy))
 
 
 def gui_can_afford(card_obj: cards.Card, gui_player: gui_player_board.GuiPlayer):
@@ -26,7 +26,6 @@ def highlight_buyable_cards(market_containers, gui_player):
     for row in market_containers:
         for card in row:
             card_container = card
-            print(card_container.data)
             if card_container.data in ['I', 'II', 'III']:  # if card is top-of-deck, ignore it
                 continue
             card_obj = card_container.data.card_obj
