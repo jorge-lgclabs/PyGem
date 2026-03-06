@@ -26,6 +26,9 @@ def highlight_buyable_cards(market_containers, gui_player):
     for row in market_containers:
         for card in row:
             card_container = card
+            print(card_container.data)
+            if card_container.data in ['I', 'II', 'III']:  # if card is top-of-deck, ignore it
+                continue
             card_obj = card_container.data.card_obj
             if gui_can_afford(card_obj, gui_player):
                 card_container.border = ft.border.all(3, ft.Colors.GREEN_500)

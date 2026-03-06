@@ -177,11 +177,11 @@ class CardMarket:
         else:
             text = "III"
 
-        text = ft.Text(value=text, size=CARD_HEIGHT * .5, text_align=ft.TextAlign.CENTER, font_family="lobster", style=FILLED_WITH_STROKE)
+        text_obj = ft.Text(value=text, size=CARD_HEIGHT * .5, text_align=ft.TextAlign.CENTER, font_family="lobster", style=FILLED_WITH_STROKE)
 
-        return ft.Stack(controls=[bg_img, text], alignment=ft.alignment.Alignment.CENTER)
+        return ft.Container(content=ft.Stack(controls=[bg_img, text_obj], alignment=ft.alignment.Alignment.CENTER), data=text)
 
     def get_all_containers(self):
-        return [[self.grid_2_0, self.grid_2_1, self.grid_2_2, self.grid_2_3],
-                [self.grid_1_0, self.grid_1_1, self.grid_1_2, self.grid_1_3],
-                [self.grid_0_0, self.grid_0_1, self.grid_0_2, self.grid_0_3]]
+        return [[self.level_3_deck, self.grid_2_0, self.grid_2_1, self.grid_2_2, self.grid_2_3],
+                [self.level_2_deck, self.grid_1_0, self.grid_1_1, self.grid_1_2, self.grid_1_3],
+                [self.level_1_deck, self.grid_0_0, self.grid_0_1, self.grid_0_2, self.grid_0_3]]

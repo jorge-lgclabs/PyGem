@@ -28,16 +28,19 @@ class UserColumn:
         self.gui_obj.content.controls = ft.Text(value=('Click any card to reserve or buy (if you can afford it)\nor'
                                    '\nClick any gem in the bank to begin gem taking action'), text_align=ft.TextAlign.CENTER)
 
-    def reserve_or_buy_card(self, card_obj:cards.Card, can_buy: bool):
+    def reserve_or_buy_card(self, card_obj, can_buy: bool):
 
-        display_card = gui_cards.GameCard(card_obj)
+        if card_obj in ['1', '2', '3']:
+            display_card = ft.Text(f'Top of level {card_obj} deck', text_align=ft.TextAlign.CENTER)
+        else:
+            display_card = gui_cards.GameCard(card_obj).gui_obj
 
         # a tuple that contains the 2 args for the event handler [0] and [1], plus an event handler [2]
         event_payload = (card_obj, self.game, self.ready_to_end_turn)  # to be called by on_click handler
         self.reserve_button.data = event_payload  # "tucking" payload into the control so it can be used by the handler
 
         self.gui_obj.content.controls = [
-            display_card.gui_obj,
+            display_card,
             ft.Text('Reserve card and receive one gold', text_align=ft.TextAlign.CENTER),
             self.reserve_button,
             ft.Text('or', text_align=ft.TextAlign.CENTER),

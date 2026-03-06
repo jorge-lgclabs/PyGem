@@ -92,27 +92,19 @@ class GuiGameMaster:
     def card_click_handler(self, e):
         gui_functions.make_cards_unclickable(self.market.get_all_containers())
         gui_functions.unhighlight_all_cards(self.market.get_all_containers())
-        #self.market.update_market_grid()
-        card_container = e.control
 
-        if gui_functions.gui_can_afford(card_container.data.card_obj, self.current_player):
-            self.user_column.reserve_or_buy_card(card_container.data.card_obj, can_buy=True)
+        container_data = e.control.data
+
+
+        if type(container_data) == str:  # if the card clicked has a string data, it is the top of a deck and not a card
+            card_obj = str(len(container_data))  # text in the container either 'I', 'II', or 'III'
         else:
-            self.user_column.reserve_or_buy_card(card_container.data.card_obj, can_buy=False)
+            card_obj = container_data.card_obj
 
-        # if response == 'back':  # user backs out of move
-        #     self.user_column.initial_message()
-        #     self.user_column.update_user_column()
-        #     return
-        # else:
-        #     self.last_move = response  # self.last_move = gui_functions.gui_reserve_card(self.game, card_obj)
-
-
-
-
-        #self.user_column.user_message.value='this card?'
-        #self.user_column.commit_button.visible=True
-
+        if isinstance(card_obj, cards.Card) and gui_functions.gui_can_afford(card_obj, self.current_player):
+            self.user_column.reserve_or_buy_card(card_obj, can_buy=True)
+        else:
+            self.user_column.reserve_or_buy_card(card_obj, can_buy=False)
 
         self.refresh_gui()
 
