@@ -137,26 +137,25 @@ class PlayerReserved:
     def update_player_reserved_cards(self):
         player_reserved_list = self.player_obj.get_player_reserved()
 
-        if len(player_reserved_list) > 0:
-            cards_from_gui = []
-            for container in self.container_row:
-                if container.data is not None:
-                    if container.data.card_obj not in player_reserved_list:
-                        container.data=None
-                        container.content=None
-                        container.update()
-                    else:
-                        cards_from_gui.append(container.data.card_obj)
+        cards_from_gui = []
+        for container in self.container_row:
+            if container.data is not None:
+                if container.data.card_obj not in player_reserved_list:
+                    container.data=None
+                    container.content=None
+                    container.update()
+                else:
+                    cards_from_gui.append(container.data.card_obj)
 
-            for card in player_reserved_list:
-                if card not in cards_from_gui:
-                    new_card = card
-                    for container in self.container_row:
-                        if container.data is None:
-                            container.data = GameCard(new_card)
-                            container.content =container.data.gui_obj
-                            break
-                    break
+        for card in player_reserved_list:
+            if card not in cards_from_gui:
+                new_card = card
+                for container in self.container_row:
+                    if container.data is None:
+                        container.data = GameCard(new_card)
+                        container.content =container.data.gui_obj
+                        break
+                break
 
 class GuiPlayer:
     def __init__(self, player_obj: player.Player):
