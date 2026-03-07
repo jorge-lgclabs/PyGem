@@ -71,6 +71,8 @@ class GuiGameMaster:
         gui_functions.highlight_buyable_cards(self.market.get_all_containers(), self.current_player)
         gui_functions.highlight_and_make_clickable_reserved_cards(self.current_player.get_buyable_reserved_containers(), self.card_click_handler)
         self.game_bank.make_bank_color_containers_clickable(token_taker_handler=self.token_click_handler)
+        self.token_bank_cache = {}
+        self.token_take_cache = []
         self.market.update_market_grid()
         self.user_column.initial_message()
         self.user_column.update_user_column()
@@ -93,6 +95,8 @@ class GuiGameMaster:
         gui_functions.make_cards_clickable(self.market.get_all_containers(), self.card_click_handler)
         gui_functions.highlight_and_make_clickable_reserved_cards(self.current_player.get_buyable_reserved_containers(), self.card_click_handler)
         self.game_bank.make_bank_color_containers_clickable(token_taker_handler=self.token_click_handler)
+        self.token_bank_cache = {}
+        self.token_take_cache = []
 
         self.refresh_gui()
         self.user_column.initial_message()
@@ -137,11 +141,15 @@ class GuiGameMaster:
             pass
         remaining_colors = []
         to_remove = []
+
         for key in self.token_bank_cache.keys():
-            if self.token_bank_cache[key] == 0:
+            if self.token_bank_cache[key] == 0:  # remove those colors which have been expended
+                to_remove.append(key)
+            elif key == self.token_take_cache[0] and self.token_bank_cache[key] < 2: # remove color that violates "take 2 only if 3 or more of it" rule
                 to_remove.append(key)
             else:
-                remaining_colors.append(key[0])
+                remaining_colors.append(key[0])  # otherwise, leave color as remaining choice
+
         for color in to_remove:
             self.token_bank_cache.pop(color)
         self.game_bank.make_bank_color_containers_clickable(token_taker_handler=self.token_click_handler, which_colors=remaining_colors)
