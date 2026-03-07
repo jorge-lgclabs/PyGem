@@ -101,8 +101,8 @@ class UserColumn:
         else:
             final_move_tuple = (first_take, second_take)
             if third_take:
-                final_move_tuple += third_take
-            event_payload = [final_move_tuple, self.ready_to_end_turn]
+                final_move_tuple += (third_take,)
+            event_payload = [final_move_tuple, self.game.take_tokens, self.ready_to_end_turn]
             self.gui_obj.content.controls.append(
                 ft.Button(content='Commit move', data=event_payload, on_click=gui_functions.gui_commit_token_take)
             )

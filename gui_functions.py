@@ -66,4 +66,7 @@ def unhighlight_and_make_unclickable_reserved_cards(reserved_containers):
         card_container.border = None
 
 def gui_commit_token_take(e):
-    pass
+    to_take_tuple, take_token_func, end_turn_func = e.control.data
+    to_take_list = list(to_take_tuple)
+    move = take_token_func(is_gui=True, to_take=to_take_list)
+    end_turn_func(last_move=move)

@@ -143,7 +143,7 @@ class GameMaster:
         self._turn += 1
 
 
-    def take_tokens(self, player=None):
+    def take_tokens(self, player=None, is_gui=False, to_take=None):
         """Method representing the in-game action of a player taking tokens. In Splendor a player can either take a single gem of 3 different kinds, or 2 of a single kind, barring there are less than 3 total of that kind"""
         if player is None:  # for the sake of the GUI implementation can call without getting current player
             player = self.get_current_player()
@@ -153,10 +153,14 @@ class GameMaster:
             for color in taken:
                 self._bank.withdraw(color)  # withdraw from the real bank this time
                 player.deposit_bank(color)  # deposit the real tokens into the real players bank
+            if not is_gui:
+                return self.end_turn("took tokens " + str(taken))
+            else:
+                return "took tokens " + str(taken)
 
-            self.end_turn(("took tokens " + str(taken)))
-
-            return True
+        if is_gui: # for gui purposes
+            taken=to_take
+            return commit_tokens()
 
         take = 0  # how many tokens the player has taken
         taken = [] # a list of the color taken at each take
@@ -225,8 +229,7 @@ class GameMaster:
             # The third and final mechanism of the third token being taken from the fake bank
             fake_bank.withdraw(third_take)
             taken.append(third_take)
-            if commit_tokens() is True: # jumps to committing the move
-                return
+            commit_tokens() # jumps to committing the move
 
     def initialize_visible_cards(self):
         """Starts the mechanism which maintains the visible cards (those that are on the table and in play)"""

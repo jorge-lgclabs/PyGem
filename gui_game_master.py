@@ -136,9 +136,32 @@ class GuiGameMaster:
             self.token_bank_cache[clicked_color] -= 1
             self.user_column.token_taking_messages(first_take=self.token_take_cache[0])
         elif len(self.token_take_cache) == 1: # second token-taking action
-            pass
-        else:                                 # third token-taking action
-            pass
+            self.token_take_cache.append(clicked_color)
+            if self.token_take_cache[0] == self.token_take_cache[1]: # if the player took two of the same color
+                self.game_bank.make_bank_color_containers_clickable(self.token_click_handler, which_colors=[]) # make all tokens unclickable
+                self.user_column.token_taking_messages(
+                    first_take=self.token_take_cache[0],
+                    second_take=self.token_take_cache[1],
+                    end=True)
+                return # end here since this is the last move if 2 of the same color are taken
+            else: # if the player took another color other than the first, necessitating a third taking action
+                self.token_bank_cache[clicked_color] -= 1
+                self.user_column.token_taking_messages(
+                    first_take=self.token_take_cache[0],
+                    second_take=self.token_take_cache[1])
+                if self.token_take_cache[0] in self.token_bank_cache.keys():
+                    self.token_bank_cache.pop(self.token_take_cache[0])
+                self.token_bank_cache.pop(self.token_take_cache[1])
+
+        else: # third token-taking action
+            self.token_take_cache.append(clicked_color)
+            self.game_bank.make_bank_color_containers_clickable(self.token_click_handler, which_colors=[])  # make all tokens unclickable
+            self.user_column.token_taking_messages(
+                first_take=self.token_take_cache[0],
+                second_take=self.token_take_cache[1],
+                third_take=self.token_take_cache[2],
+                end=True)
+            return # final move
         remaining_colors = []
         to_remove = []
 
