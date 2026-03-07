@@ -66,6 +66,7 @@ class UserColumn:
         # now conditionally make elements invisible based on available moves
         index_to_be_invisible = []
         current_reserved = self.game.get_current_player().get_player_reserved()
+
         # if player has reserved the max # of cards or is trying to buy an already reserved card
         if len(current_reserved) == 3 or card_obj in current_reserved:
             index_to_be_invisible.extend([0,1,2,3])
@@ -81,6 +82,34 @@ class UserColumn:
         for index in index_to_be_invisible:
             self.gui_obj.content.controls[index].visible = False
 
+    def token_taking_messages(self, first_take, second_take=None, third_take=None, end=False):
+        self.gui_obj.content.controls = [
+            ft.Text(f'First gem taken: {first_take}', text_align=ft.TextAlign.CENTER)
+        ]
+        if second_take:
+            self.gui_obj.content.controls.append(
+                ft.Text(f'Second gem taken: {second_take}', text_align=ft.TextAlign.CENTER)
+            )
+        if third_take:
+            self.gui_obj.content.controls.append(
+                ft.Text(f'Third gem taken: {third_take}', text_align=ft.TextAlign.CENTER)
+            )
+        if not end:
+            self.gui_obj.content.controls.append(
+                ft.Text(f'Click another gem to continue gem-taking action', text_align=ft.TextAlign.CENTER)
+            )
+        else:
+            final_move_tuple = (first_take, second_take)
+            if third_take:
+                final_move_tuple += third_take
+            event_payload = [final_move_tuple, self.ready_to_end_turn]
+            self.gui_obj.content.controls.append(
+                ft.Button(content='Commit move', data=event_payload, on_click=gui_functions.gui_commit_token_take)
+            )
+        self.gui_obj.content.controls.extend([
+            ft.Text('or', text_align=ft.TextAlign.CENTER),
+            self.back_button]
+        )
 
     def ready_to_end_turn(self, last_move):
         self.refresh_gui()

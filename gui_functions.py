@@ -64,3 +64,6 @@ def unhighlight_and_make_unclickable_reserved_cards(reserved_containers):
     for card_container in reserved_containers:
         card_container.on_click = None
         card_container.border = None
+
+def gui_commit_token_take(e):
+    pass

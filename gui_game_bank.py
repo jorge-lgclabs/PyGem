@@ -4,7 +4,7 @@ import PyGem
 import player
 
 
-from gui_assets import GEM_LOOKUP, RED_GEM, WHITE_GEM, BLUE_GEM, GREEN_GEM, NOIR_GEM, GOLD_COIN
+from gui_assets import GEM_LOOKUP, RED_GEM, WHITE_GEM, BLUE_GEM, GREEN_GEM, NOIR_GEM, GOLD_COIN, CARD_ROUNDING_RADIUS
 from gui_assets import CARD_HEIGHT, CARD_WIDTH
 from gui_assets import PLAYER_BANK_CELL_SIZE, PLAYER_BANK_HEIGHT, PLAYER_BANK_WIDTH, PLAYER_BANK_ROUNDING_RADIUS, SHADE_OPACITY
 from gui_assets import CircleWithNum, NumWithStrokeCenter
@@ -55,7 +55,7 @@ class GameBank:
 
             bank_text_container = ft.Container(content=bank_text_obj.gui_obj, width=self.size, height=self.size,
                                           alignment=ft.alignment.Alignment.CENTER)
-            bank_color_container = ft.Container(border_radius=PLAYER_BANK_ROUNDING_RADIUS,
+            bank_color_container = ft.Container(data=letter, border_radius=PLAYER_BANK_ROUNDING_RADIUS,
                                                 alignment=ft.alignment.Alignment.CENTER, height=self.size * 1.35,
                                                 clip_behavior=ft.ClipBehavior.ANTI_ALIAS, content=bank_text_container,
                                                 width=self.size * 1.35,
@@ -110,6 +110,29 @@ class GameBank:
             opacity=SHADE_OPACITY,
             alignment=ft.alignment.Alignment.CENTER)
 
+    def get_bank_color_containers(self):
+        bank_color_containers = []
+        column_of_mini_columns = self.grid_container.content.controls
+        for mini_column in column_of_mini_columns:
+            if mini_column.controls[1].data is not None:
+                bank_color_containers.append(mini_column.controls[1])
 
+        return bank_color_containers
 
+    def make_bank_color_containers_clickable(self, token_taker_handler, which_colors=None):
+        for container in self.get_bank_color_containers():
+            container.on_click = None
+            container.border = None
+
+        for container in self.get_bank_color_containers():
+            if which_colors is None:
+                which_colors = []
+                for letter in ['w', 'r', 'g', 'b', 'n']:
+                    if self.bank.get_token_num(GEM_LOOKUP[letter][2]) > 0:
+                        which_colors.append(letter)
+
+            if container.data in which_colors:
+                container.on_click = token_taker_handler
+                container.border = ft.border.all(3, ft.Colors.GREEN_500)
+                container.border_radius = CARD_ROUNDING_RADIUS
 

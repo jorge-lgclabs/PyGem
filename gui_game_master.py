@@ -4,7 +4,7 @@ import gui_user_column
 from PyGem import GameMaster
 import flet as ft
 
-from gui_assets import CARD_ROUNDING_RADIUS
+from gui_assets import CARD_ROUNDING_RADIUS, GEM_LOOKUP
 
 
 class GuiGameMaster:
@@ -17,6 +17,8 @@ class GuiGameMaster:
         self.game_bank = gui_game_bank.GameBank(game)
         self.user_column = gui_user_column.UserColumn(game, self.go_back_from_move, self.end_turn_change_player, self.refresh_gui)
         self.last_move = ''
+        self.token_take_cache = []
+        self.token_bank_cache = {}
 
         # not meant to be done at the outset, only here for testing purposes
         gui_functions.highlight_buyable_cards(self.market.get_all_containers(), self.current_player)
@@ -51,6 +53,7 @@ class GuiGameMaster:
             self.current_player.player_reserved.gui_obj
         ], horizontal_alignment=ft.CrossAxisAlignment.CENTER, alignment=ft.MainAxisAlignment.CENTER)
         gui_functions.make_cards_clickable(self.market.get_all_containers(), self.card_click_handler)
+        self.game_bank.make_bank_color_containers_clickable(token_taker_handler=self.token_click_handler)
 
         return ft.Row(controls=[self.user_column.gui_obj, self.market_and_player_board, self.game_bank.gui_obj], spacing=30,
                         vertical_alignment=ft.CrossAxisAlignment.CENTER, alignment=ft.MainAxisAlignment.CENTER)
@@ -67,6 +70,7 @@ class GuiGameMaster:
         gui_functions.make_cards_clickable(self.market.get_all_containers(), self.card_click_handler)
         gui_functions.highlight_buyable_cards(self.market.get_all_containers(), self.current_player)
         gui_functions.highlight_and_make_clickable_reserved_cards(self.current_player.get_buyable_reserved_containers(), self.card_click_handler)
+        self.game_bank.make_bank_color_containers_clickable(token_taker_handler=self.token_click_handler)
         self.market.update_market_grid()
         self.user_column.initial_message()
         self.user_column.update_user_column()
@@ -88,6 +92,7 @@ class GuiGameMaster:
         gui_functions.highlight_buyable_cards(self.market.get_all_containers(), self.current_player)
         gui_functions.make_cards_clickable(self.market.get_all_containers(), self.card_click_handler)
         gui_functions.highlight_and_make_clickable_reserved_cards(self.current_player.get_buyable_reserved_containers(), self.card_click_handler)
+        self.game_bank.make_bank_color_containers_clickable(token_taker_handler=self.token_click_handler)
 
         self.refresh_gui()
         self.user_column.initial_message()
@@ -96,6 +101,7 @@ class GuiGameMaster:
         gui_functions.make_cards_unclickable(self.market.get_all_containers())
         gui_functions.unhighlight_all_cards(self.market.get_all_containers())
         gui_functions.unhighlight_and_make_unclickable_reserved_cards(self.current_player.get_buyable_reserved_containers())
+        self.game_bank.make_bank_color_containers_clickable(token_taker_handler=self.token_click_handler, which_colors=[])
 
         container_data = e.control.data
 
@@ -111,6 +117,35 @@ class GuiGameMaster:
             self.user_column.reserve_or_buy_card(card_obj, can_buy=False)
 
         self.refresh_gui()
+
+    def token_click_handler(self, e):
+        gui_functions.make_cards_unclickable(self.market.get_all_containers())
+        gui_functions.unhighlight_all_cards(self.market.get_all_containers())
+
+        clicked_color = GEM_LOOKUP[e.control.data][2]
+
+        if len(self.token_take_cache) == 0: # first token-taking action
+            available_colors = self.game_bank.bank.get_available_tokens()
+            for color in available_colors:
+                self.token_bank_cache[color] = self.game_bank.bank.get_token_num(color)
+            self.token_take_cache.append(clicked_color)
+            self.token_bank_cache[clicked_color] -= 1
+            self.user_column.token_taking_messages(first_take=self.token_take_cache[0])
+        elif len(self.token_take_cache) == 1: # second token-taking action
+            pass
+        else:                                 # third token-taking action
+            pass
+        remaining_colors = []
+        to_remove = []
+        for key in self.token_bank_cache.keys():
+            if self.token_bank_cache[key] == 0:
+                to_remove.append(key)
+            else:
+                remaining_colors.append(key[0])
+        for color in to_remove:
+            self.token_bank_cache.pop(color)
+        self.game_bank.make_bank_color_containers_clickable(token_taker_handler=self.token_click_handler, which_colors=remaining_colors)
+
 
 
 
