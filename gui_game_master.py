@@ -12,7 +12,7 @@ class GuiGameMaster:
         self.game = game
         self.gui_players = [gui_player_board.GuiPlayer(player) for player in game._players]
         self.update_current_gui_player()
-        self.test_moves()
+        #self.test_moves()
         self.market = gui_cards.CardMarket(game)
         self.game_bank = gui_game_bank.GameBank(game)
         self.user_column = gui_user_column.UserColumn(game, self.go_back_from_move, self.end_turn_change_player, self.refresh_gui)
@@ -21,8 +21,8 @@ class GuiGameMaster:
         self.token_bank_cache = {}
 
         # not meant to be done at the outset, only here for testing purposes
-        gui_functions.highlight_buyable_cards(self.market.get_all_containers(), self.current_player)
-        self.current_player.player_bank.update_player_bank_values()
+        #gui_functions.highlight_buyable_cards(self.market.get_all_containers(), self.current_player)
+        #self.current_player.player_bank.update_player_bank_values()
 
     def test_moves(self):
         # testing bank
@@ -61,6 +61,7 @@ class GuiGameMaster:
     def refresh_gui(self):
         self.current_player.player_reserved.update_player_reserved_cards()
         self.current_player.player_bank.update_player_bank_values()
+        self.current_player.update_player_points()
         self.market.update_market_grid()
         self.game_bank.update_game_bank_values()
         self.user_column.update_user_column()

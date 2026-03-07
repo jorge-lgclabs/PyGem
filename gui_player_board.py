@@ -52,8 +52,6 @@ class PlayerBank:
         gold_value = self.player_obj.bank_lookup('gold')
         self.gold_text_obj.set_num(gold_value)
 
-
-
     def create_bank_and_dado_grid(self):
         bank_and_dado_row = []
         gem_icon_row = []
@@ -165,7 +163,7 @@ class GuiPlayer:
         self.player_obj = player_obj
         self.player_bank = PlayerBank(self.player_obj)
         self.player_reserved = PlayerReserved(self.player_obj)
-        self.player_label = ft.Text(value=f"Current player: {self.player_obj._player_name}", size=30, style=FILLED_WITH_STROKE, text_align=ft.TextAlign.CENTER)
+        self.player_label = ft.Text(value=f"Current player: {self.player_obj._player_name}  ---  Points: {self.player_obj.points}", size=30, style=FILLED_WITH_STROKE, text_align=ft.TextAlign.CENTER)
 
     def get_buyable_reserved_containers(self):
         reserved_containers = []
@@ -177,6 +175,9 @@ class GuiPlayer:
                     reserved_containers.append(container)
 
         return reserved_containers
+
+    def update_player_points(self):
+        self.player_label.value=f"Current player: {self.player_obj._player_name}  ---  Points: {self.player_obj.points}"
 
 
 
