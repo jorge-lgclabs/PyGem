@@ -97,6 +97,21 @@ class GameCard:
 
         self.row_lists[0][2].content = self.gem
 
+class NobleCard(GameCard):
+    def __init__(self, card_obj):
+        card_obj._dado = 'w'
+        card_obj._level = 3
+        super().__init__(card_obj)
+        self.noble_changes()
+
+    def noble_changes(self):
+        self.row_lists[0][2].content = None
+        for element in self.gui_obj.controls:
+            element.width = CARD_WIDTH
+            element.height = CARD_WIDTH
+            if element.parent:
+                element.update()
+
 class CardMarket:
     def __init__(self,game: PyGem.GameMaster):
         self.game = game

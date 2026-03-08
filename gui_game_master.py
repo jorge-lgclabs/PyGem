@@ -47,6 +47,7 @@ class GuiGameMaster:
 
     def load_initial_gui(self):
         self.market_and_player_board = ft.Column(controls=[
+            gui_cards.NobleCard(self.game._nobles_deck[0]).gui_obj,
             self.market.gui_obj,
             self.current_player.player_label,
             self.current_player.player_bank.gui_obj,
