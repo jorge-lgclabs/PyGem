@@ -105,12 +105,37 @@ class NobleCard(GameCard):
         self.noble_changes()
 
     def noble_changes(self):
+        # remove the gem icon
         self.row_lists[0][2].content = None
+
+        # change the size
         for element in self.gui_obj.controls:
             element.width = CARD_WIDTH
-            element.height = CARD_WIDTH
+            element.height = CARD_WIDTH * .93
             if element.parent:
                 element.update()
+
+        # re-arrange the cost circles
+        self.row_lists[2][2].content = self.row_lists[3][1].content
+        self.row_lists[2][1].content = self.row_lists[2][0].content
+        self.row_lists[2][0].content = self.row_lists[3][0].content
+        self.row_lists[3][0].content = None
+        self.row_lists[3][1].content = None
+
+class NobleMarket:
+    def __init__(self, game: PyGem.GameMaster):
+        self.game = game
+        self.gui_obj = ft.Row()
+        self.nobles_GameCard_objs = []
+        self.fill_nobles_row()
+
+    def fill_nobles_row(self):
+        nobles_from_game = self.game._nobles_deck
+        for noble in nobles_from_game:
+            self.nobles_GameCard_objs.append(NobleCard(noble))
+        for noble_GameCard in self.nobles_GameCard_objs:
+            self.gui_obj.controls.append(noble_GameCard.gui_obj)
+
 
 class CardMarket:
     def __init__(self,game: PyGem.GameMaster):

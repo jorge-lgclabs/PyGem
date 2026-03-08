@@ -14,6 +14,7 @@ class GuiGameMaster:
         self.update_current_gui_player()
         #self.test_moves()
         self.market = gui_cards.CardMarket(game)
+        self.nobles = gui_cards.NobleMarket(game)
         self.game_bank = gui_game_bank.GameBank(game)
         self.user_column = gui_user_column.UserColumn(game, self.go_back_from_move, self.end_turn_change_player, self.refresh_gui)
         self.last_move = ''
@@ -47,7 +48,7 @@ class GuiGameMaster:
 
     def load_initial_gui(self):
         self.market_and_player_board = ft.Column(controls=[
-            gui_cards.NobleCard(self.game._nobles_deck[0]).gui_obj,
+            self.nobles.gui_obj,
             self.market.gui_obj,
             self.current_player.player_label,
             self.current_player.player_bank.gui_obj,
