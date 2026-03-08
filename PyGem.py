@@ -131,6 +131,7 @@ class GameMaster:
                 self.get_current_player().add_to_hand(noble)
                 self.get_current_player().points += noble.get_points()
                 self._nobles_deck.remove(noble)
+                print(f'{self.get_current_player().get_player_name()} earned the noble {noble}')
 
         # check if Player has now won
         if self.get_current_player().points >= 15:
@@ -319,9 +320,12 @@ class GameMaster:
         card_to_buy.set_visible(False)  # make the bought card not visible anymore (remove from table)
         card_to_buy.set_owner(player)  # set the card's owner to the current player
         player.add_to_hand(card_to_buy)  # add it to their hand
-        self.get_next_card(card_to_buy).set_visible(True)  # make the next card in that deck visible (place it on table)
-        player.remove_from_reserved(card_to_buy)  # removes the card from player's reserve (if that is where they got it from)
-        card_to_buy.set_reserved_by(None)  # set Card as not being reserved by anyone
+
+        if card_to_buy in player.get_player_reserved(): # if the player is buying it from their reserved pile
+            player.remove_from_reserved(card_to_buy)  # removes the card from player's reserve
+            card_to_buy.set_reserved_by(None)  # set Card as not being reserved by anyone
+        else: # if the card was bought from the market
+            self.get_next_card(card_to_buy).set_visible(True)  # make the next card in that deck visible (place it on table)
 
         # giving the player the dado they have earned
         if card_to_buy.get_dado() == 'w':
@@ -368,7 +372,7 @@ class GameMaster:
         if not is_gui: # original command line ending to this function
             self.end_turn(("bought card " + str(card_to_buy)))
         else: # for gui
-            return "bought card" + str(card_to_buy)
+            return "bought card " + str(card_to_buy)
 
     def reserve_card(self, player=None, is_gui=False, incoming_card=None):
         """Method representing the in-game action of a player reserving a card, receives a Player object and allows that player to reserve any visible Card or the next_card of any row and receive a gold token"""
