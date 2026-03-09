@@ -128,13 +128,28 @@ class NobleCard(GameCard):
             if element.parent:
                 element.update()
 
-        # re-arrange the cost circles
-        print(self.row_lists[3][0].content.content.value)
-        self.row_lists[2][2].content = self.row_lists[3][1].content
-        self.row_lists[2][1].content = self.row_lists[2][0].content
-        self.row_lists[2][0].content = self.row_lists[3][0].content
-        self.row_lists[3][0].content = None
-        self.row_lists[3][1].content = None
+        # re-arrange and re-make the cost circles
+        coord_shifts = [((3,0), (2,0)), ((2,0), (2,1))]
+        if self.row_lists[3][1].content is not None:
+            coord_shifts.append(((3,1), (2,2)))
+        coord_shifts.reverse()
+
+        for old_coords, new_coords in coord_shifts:
+            text_obj = self.row_lists[old_coords[0]][old_coords[1]].content.content
+            color = self.row_lists[old_coords[0]][old_coords[1]].content.bgcolor
+
+            new_container = self.row_lists[new_coords[0]][new_coords[1]]
+
+            new_container.bgcolor = color
+            new_container.border_radius = CARD_ROUNDING_RADIUS * .78
+            new_container.height = CELL_SIZE * .90
+            new_container.width = CELL_SIZE * .90
+            new_container.alignment = ft.Alignment.CENTER
+            new_container.content = text_obj
+
+            self.row_lists[old_coords[0]][old_coords[1]].content = None
+
+        self.row_objects[2].spacing = GRID_SPACING * 4
 
         # change background images
         for card_str, bg_img in self.nobles_bg.items():
@@ -155,6 +170,10 @@ class NobleMarket:
         for noble_GameCard in self.nobles_GameCard_objs:
             self.gui_obj.controls.append(noble_GameCard.gui_obj)
 
+    def refresh_nobles_row(self):
+        self.gui_obj.controls = []
+        self.nobles_GameCard_objs = []
+        self.fill_nobles_row()
 
 class CardMarket:
     def __init__(self,game: PyGem.GameMaster):

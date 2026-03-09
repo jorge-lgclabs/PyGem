@@ -6,6 +6,7 @@ import PyGem
 import cards
 import gui_cards
 import gui_functions
+from gui_assets import GEM_LOOKUP, CARD_ROUNDING_RADIUS
 
 
 class UserColumn:
@@ -84,7 +85,8 @@ class UserColumn:
 
     def token_taking_messages(self, first_take, second_take=None, third_take=None, end=False):
         self.gui_obj.content.controls = [
-            ft.Text(f'First gem taken: {first_take}', text_align=ft.TextAlign.CENTER)
+            ft.Text(f'First gem taken:', text_align=ft.TextAlign.CENTER),
+            ft.Container(content=ft.Text(f'{first_take}'), bgcolor=GEM_LOOKUP[first_take[0]][0], border_radius = CARD_ROUNDING_RADIUS)
         ]
         if second_take:
             self.gui_obj.content.controls.append(
