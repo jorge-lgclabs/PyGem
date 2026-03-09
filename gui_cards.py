@@ -102,6 +102,19 @@ class NobleCard(GameCard):
         card_obj._dado = 'w'
         card_obj._level = 3
         super().__init__(card_obj)
+        self.nobles_bg = {
+            'w3b3g0r0n3': 'red-noble-2.png',
+            'w0b3g3r3n0': 'green-noble-2.png',
+            'w3b0g0r3n3': 'noir-noble-1.png',
+            'w0b0g4r4n0': 'green-noble-1.png',
+            'w0b4g4r0n0': 'blue-noble-1.png',
+            'w0b0g0r4n4': 'red-noble-1.png',
+            'w4b0g0r0n4': 'white-noble-1.png',
+            'w3b3g3r0n0': 'blue-noble-2.png',
+            'w0b0g3r3n3': 'noir-noble-2.png',
+            'w4b4g0r0n0': 'white-noble-2.png'
+        }
+
         self.noble_changes()
 
     def noble_changes(self):
@@ -116,11 +129,17 @@ class NobleCard(GameCard):
                 element.update()
 
         # re-arrange the cost circles
+        print(self.row_lists[3][0].content.content.value)
         self.row_lists[2][2].content = self.row_lists[3][1].content
         self.row_lists[2][1].content = self.row_lists[2][0].content
         self.row_lists[2][0].content = self.row_lists[3][0].content
         self.row_lists[3][0].content = None
         self.row_lists[3][1].content = None
+
+        # change background images
+        for card_str, bg_img in self.nobles_bg.items():
+            if str(self.card_obj) == card_str:
+                self.gui_obj.controls[0].src=f'/images/{bg_img}'
 
 class NobleMarket:
     def __init__(self, game: PyGem.GameMaster):
