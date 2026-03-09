@@ -6,7 +6,7 @@ import PyGem
 import cards
 import gui_cards
 import gui_functions
-from gui_assets import GEM_LOOKUP, CARD_ROUNDING_RADIUS
+from gui_assets import GEM_LOOKUP, CARD_ROUNDING_RADIUS, MessageToken
 
 
 class UserColumn:
@@ -86,15 +86,17 @@ class UserColumn:
     def token_taking_messages(self, first_take, second_take=None, third_take=None, end=False):
         self.gui_obj.content.controls = [
             ft.Text(f'First gem taken:', text_align=ft.TextAlign.CENTER),
-            ft.Container(content=ft.Text(f'{first_take}'), bgcolor=GEM_LOOKUP[first_take[0]][0], border_radius = CARD_ROUNDING_RADIUS)
+            MessageToken(first_take).gui_obj
         ]
         if second_take:
-            self.gui_obj.content.controls.append(
-                ft.Text(f'Second gem taken: {second_take}', text_align=ft.TextAlign.CENTER)
+            self.gui_obj.content.controls.extend([
+                ft.Text(f'Second gem taken:', text_align=ft.TextAlign.CENTER),
+                MessageToken(second_take).gui_obj]
             )
         if third_take:
-            self.gui_obj.content.controls.append(
-                ft.Text(f'Third gem taken: {third_take}', text_align=ft.TextAlign.CENTER)
+            self.gui_obj.content.controls.extend([
+                ft.Text(f'Third gem taken:', text_align=ft.TextAlign.CENTER),
+                MessageToken(third_take).gui_obj]
             )
         if not end:
             self.gui_obj.content.controls.append(

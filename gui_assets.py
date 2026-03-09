@@ -82,3 +82,12 @@ class NumWithStrokeCenter:
         self.gui_obj.value = str(new_num)
         if self.gui_obj.parent is not None:
             self.gui_obj.update()
+
+class MessageToken:
+    def __init__(self, color):
+        if color == 'noir':
+            text_color = 'white'
+        else:
+            text_color = 'black'
+        self.gui_obj = ft.Container(content=ft.Text(f'{color}', color=text_color, weight=ft.FontWeight.BOLD), padding=10,
+                     bgcolor=GEM_LOOKUP[color[0]][0], border_radius=CARD_ROUNDING_RADIUS)
