@@ -17,10 +17,12 @@ class GuiGameMaster:
         self.nobles = gui_cards.NobleMarket(game)
         self.game_bank = gui_game_bank.GameBank(game)
         self.test_moves()
-        self.user_column = gui_user_column.UserColumn(game, self.go_back_from_move, self.end_turn_change_player, self.refresh_gui)
+        self.user_column = gui_user_column.UserColumn(game, self.go_back_from_move, self.end_turn_change_player, self.refresh_gui, self.token_giveback_handler)
         self.last_move = ''
         self.token_take_cache = []
         self.token_bank_cache = {}
+        self.token_giveback_cache = int()
+        self.token_player_cache = {}
 
 
 
@@ -52,6 +54,7 @@ class GuiGameMaster:
 
         gui_functions.highlight_buyable_cards(self.market.get_all_containers(), self.current_player)
         self.current_player.player_bank.update_player_bank_values()
+        self.game_bank.update_game_bank_values()
 
 
     def update_current_gui_player(self):
@@ -146,20 +149,31 @@ class GuiGameMaster:
         clicked_color = GEM_LOOKUP[e.control.data][2]
 
         if len(self.token_take_cache) == 0: # first token-taking action
+            # subsection for calculating whether eventually the player will have to give back tokens (more than 10)
+            self.token_giveback_cache = (self.current_player.player_obj.get_player_bank_length() +
+                                         self.current_player.player_obj.get_player_tender()[1] +
+                                         1)
+
             available_colors = self.game_bank.bank.get_available_tokens()
             for color in available_colors:
                 self.token_bank_cache[color] = self.game_bank.bank.get_token_num(color)
-            self.token_take_cache.append(clicked_color)
+            self.token_take_cache = [clicked_color]
             self.token_bank_cache[clicked_color] -= 1
             self.user_column.token_taking_messages(first_take=self.token_take_cache[0])
         elif len(self.token_take_cache) == 1: # second token-taking action
+            self.token_giveback_cache += 1
             self.token_take_cache.append(clicked_color)
             if self.token_take_cache[0] == self.token_take_cache[1]: # if the player took two of the same color
+                self.token_giveback_cache -= 10
+                if self.token_giveback_cache <= 0:
+                    self.token_giveback_cache = 0
                 self.game_bank.make_bank_color_containers_clickable(self.token_click_handler, which_colors=[]) # make all tokens unclickable
                 self.user_column.token_taking_messages(
                     first_take=self.token_take_cache[0],
                     second_take=self.token_take_cache[1],
-                    end=True)
+                    end=True,
+                    giveback=self.token_giveback_cache
+                )
                 return # end here since this is the last move if 2 of the same color are taken
             else: # if the player took another color other than the first, necessitating a third taking action
                 self.token_bank_cache[clicked_color] -= 1
@@ -171,13 +185,19 @@ class GuiGameMaster:
                 self.token_bank_cache.pop(self.token_take_cache[1])
 
         else: # third token-taking action
+            self.token_giveback_cache += 1
+            self.token_giveback_cache -= 10
+            if self.token_giveback_cache <= 0:
+                self.token_giveback_cache = 0
+
             self.token_take_cache.append(clicked_color)
             self.game_bank.make_bank_color_containers_clickable(self.token_click_handler, which_colors=[])  # make all tokens unclickable
             self.user_column.token_taking_messages(
                 first_take=self.token_take_cache[0],
                 second_take=self.token_take_cache[1],
                 third_take=self.token_take_cache[2],
-                end=True)
+                end=True,
+                giveback=self.token_giveback_cache)
             return # final move
         remaining_colors = []
         to_remove = []
@@ -194,6 +214,37 @@ class GuiGameMaster:
             self.token_bank_cache.pop(color)
         self.game_bank.make_bank_color_containers_clickable(token_taker_handler=self.token_click_handler, which_colors=remaining_colors)
 
+    def token_giveback_handler(self, e, giveback=None, last_move=None):
+        if e is None:  # means this is the first call, the setup to the giveback loop
+            self.refresh_gui()
+            self.token_giveback_cache = giveback
+            self.last_move = last_move
+            self.token_take_cache = []
+            for color in ['red', 'blue', 'white', 'green', 'noir']:
+                if int(self.current_player.player_obj.bank_lookup(color)) > 0:
+                    self.token_player_cache[color] = int(self.current_player.player_obj.bank_lookup(color))
+            self.user_column.token_giveback_messages(self.token_player_cache.keys(), 1)
+        else:
+            # means this is the first, second, or third giveback click
+            clicked_color = e.control.data
+
+            self.current_player.player_obj.withdraw(clicked_color)
+            self.game_bank.bank.deposit(clicked_color)
+            self.refresh_gui()
+
+            self.token_take_cache.append(clicked_color)
+            self.token_player_cache[clicked_color] -= 1
+            if self.token_player_cache[clicked_color] == 0:
+                self.token_player_cache.pop(clicked_color)
+            # if this is the last token to give back, end turn
+            if len(self.token_take_cache) == self.token_giveback_cache:
+                self.user_column.ready_to_end_turn(f'{self.last_move} and gave back {self.token_take_cache}')
+            else:  # otherwise, ask for more tokens back
+                if self.token_giveback_cache - len(self.token_take_cache) == 1:
+                    iteration = self.token_giveback_cache
+                else:
+                    iteration = 2
+                self.user_column.token_giveback_messages(self.token_player_cache.keys(), iteration)
 
 
 

@@ -6,13 +6,15 @@ import PyGem
 import cards
 import gui_cards
 import gui_functions
+import gui_game_master
 from gui_assets import GEM_LOOKUP, CARD_ROUNDING_RADIUS, MessageToken
 
 
 class UserColumn:
-    def __init__(self, game, back_func, end_turn_func, refresh_gui_func):
+    def __init__(self, game, back_func, end_turn_func, refresh_gui_func, giveback_func):
         self.game: PyGem.GameMaster = game
         self.refresh_gui = refresh_gui_func
+        self.giveback_func = giveback_func
         self.end_turn_button = ft.Button(content='End Turn', on_click=end_turn_func)
         self.back_button = ft.Button(content='Go Back', on_click = back_func)
         self.buy_button = ft.Button(content='Buy Card', on_click = gui_functions.gui_buy_card)
@@ -83,7 +85,7 @@ class UserColumn:
         for index in index_to_be_invisible:
             self.gui_obj.content.controls[index].visible = False
 
-    def token_taking_messages(self, first_take, second_take=None, third_take=None, end=False):
+    def token_taking_messages(self, first_take, second_take=None, third_take=None, end=False, giveback=0):
         self.gui_obj.content.controls = [
             ft.Text(f'First gem taken:', text_align=ft.TextAlign.CENTER),
             MessageToken(first_take).gui_obj
@@ -106,14 +108,37 @@ class UserColumn:
             final_move_tuple = (first_take, second_take)
             if third_take:
                 final_move_tuple += (third_take,)
-            event_payload = [final_move_tuple, self.game.take_tokens, self.ready_to_end_turn]
-            self.gui_obj.content.controls.append(
-                ft.Button(content='Commit move', data=event_payload, on_click=gui_functions.gui_commit_token_take)
+
+            if giveback > 0:
+                event_payload = [final_move_tuple, giveback, self.game.take_tokens, self.giveback_func]
+                self.gui_obj.content.controls.extend([
+                    ft.Text(f"Warning: you will have to return {giveback} tokens to the bank after committing", text_align=ft.TextAlign.CENTER),
+                    ft.Button(content='Commit move', data=event_payload, on_click=gui_functions.gui_commit_token_take_and_giveback)
+                ])
+            else:
+                event_payload = [final_move_tuple, self.game.take_tokens, self.ready_to_end_turn]
+                self.gui_obj.content.controls.append(
+                    ft.Button(content='Commit move', data=event_payload, on_click=gui_functions.gui_commit_token_take)
             )
         self.gui_obj.content.controls.extend([
             ft.Text('or', text_align=ft.TextAlign.CENTER),
             self.back_button]
         )
+
+    def token_giveback_messages(self,giveback_options, iteration=3):
+        column = self.gui_obj.content.controls
+        column.clear()
+        iter_text = {1 : 'first', 2 : 'second', 3 : 'third'}
+        column.append(ft.Text(f'Select your {iter_text[iteration]} gem to give back to the bank:', text_align=ft.TextAlign.CENTER))
+        buttons = []
+        for color in giveback_options:
+            button = MessageToken(color).gui_obj
+            button.data = color
+            button.on_click = self.giveback_func
+            buttons.append(button)
+
+        column.extend(buttons)
+
 
     def ready_to_end_turn(self, last_move):
         self.refresh_gui()

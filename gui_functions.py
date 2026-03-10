@@ -70,3 +70,9 @@ def gui_commit_token_take(e):
     to_take_list = list(to_take_tuple)
     move = take_token_func(is_gui=True, to_take=to_take_list)
     end_turn_func(last_move=move)
+
+def gui_commit_token_take_and_giveback(e):
+   to_take_tuple, giveback, take_token_func, giveback_func = e.control.data
+   to_take_list = list(to_take_tuple)
+   move = take_token_func(is_gui=True, to_take=to_take_list)
+   giveback_func(e=None, giveback=giveback, last_move=move)
