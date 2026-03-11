@@ -1,5 +1,4 @@
 import flet as ft
-from flet.controls.border_radius import horizontal
 
 import cards
 import player
