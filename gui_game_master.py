@@ -15,7 +15,7 @@ class GuiGameMaster:
         self.market = gui_cards.CardMarket(game)
         self.nobles = gui_cards.NobleMarket(game)
         self.game_bank = gui_game_bank.GameBank(game)
-        self.test_moves()
+        #self.test_moves()
         self.user_column = gui_user_column.UserColumn(game, self.go_back_from_move, self.end_turn_change_player, self.refresh_gui, self.token_giveback_handler)
         self.last_move = ''
         self.token_take_cache = []

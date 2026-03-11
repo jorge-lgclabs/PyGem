@@ -3,7 +3,7 @@ from time import sleep
 import flet as ft
 import cards
 import gui_player_board
-from gui_assets import CARD_ROUNDING_RADIUS
+from gui_assets import CARD_ROUNDING_RADIUS, CARD_WIDTH
 from PyGem import GameMaster
 
 def gui_reserve_card(e):
@@ -76,3 +76,57 @@ def gui_commit_token_take_and_giveback(e):
    to_take_list = list(to_take_tuple)
    move = take_token_func(is_gui=True, to_take=to_take_list)
    giveback_func(e=None, giveback=giveback, last_move=move)
+
+def opening_screen(start_game_func):
+
+    def start_handler(e):
+        menu_column = e.control.parent
+        player_list = []
+        for element in menu_column.controls:
+            if isinstance(element, ft.TextField):
+                name = element.value.strip()
+                if name == '':
+                    name = element.label[17:]
+                player_list.append(name)
+        start_game_func(player_list)
+
+    def select_handler(e):
+        selected_value = e.control.value
+        menu_column = e.control.parent
+        to_remove = []
+        for element in menu_column.controls:
+            if isinstance(element, ft.TextField):
+                to_remove.append(element)
+        for element in to_remove:
+            menu_column.controls.remove(element)
+
+
+        for x in range(1,int(selected_value)+1):
+            insert_pos = x+2
+            menu_column.controls.insert(insert_pos, ft.TextField(label=f'Enter the name of player {x}'))
+
+        menu_column.update()
+
+    container = ft.Container()
+    column = ft.Column(alignment=ft.MainAxisAlignment.START,
+                       horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                       width=CARD_WIDTH * 2,
+                       height=800,
+                       spacing=40)
+    container.content = column
+    column.controls.append(ft.Container(height=200))
+    column.controls.append(ft.Text("Select the number of players:", text_align=ft.TextAlign.CENTER))
+    dropdown = ft.Dropdown(autofocus=True,
+                       options=[
+                           ft.DropdownOption(key='2', text='2'),
+                           ft.DropdownOption(key='3', text='3'),
+                           ft.DropdownOption(key='4', text='4')
+                       ],
+                        value='2',
+                        on_select=select_handler)
+    column.controls.append(dropdown)
+    column.controls.append(ft.TextField(label='Enter the name of Player 1'))
+    column.controls.append(ft.TextField(label='Enter the name of Player 2'))
+    column.controls.append(ft.Button("Start Game", on_click=start_handler))
+
+    return container
