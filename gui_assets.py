@@ -91,3 +91,21 @@ class MessageToken:
             text_color = 'black'
         self.gui_obj = ft.Container(content=ft.Text(f'{color}', color=text_color, weight=ft.FontWeight.BOLD), padding=10,
                      bgcolor=GEM_LOOKUP[color[0]][0], border_radius=CARD_ROUNDING_RADIUS)
+
+class SquareWithNum:
+    def __init__(self, num: int, size, color):
+        self.num_text = ft.Text(str(num), font_family="lobster", style=FILLED_WITH_STROKE)
+        self.gui_obj = ft.Container(content=self.num_text, bgcolor=color, border_radius=size * .5, height=size * 1.9, width=size * 1.9, alignment=ft.Alignment.CENTER)
+        self.set_size(size)
+
+    def set_size(self, new_size: int):
+        self.num_text.size = new_size * 1.3
+        if self.gui_obj.parent is not None:
+            self.gui_obj.update()
+        if self.num_text.parent is not None:
+            self.num_text.update()
+
+    def set_num(self, new_num: int):
+        self.num_text.value = str(new_num)
+        if self.gui_obj.parent is not None:
+            self.gui_obj.update()

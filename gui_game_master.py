@@ -12,7 +12,6 @@ class GuiGameMaster:
         self.game = game
         self.gui_players = [gui_player_board.GuiPlayer(player) for player in game._players]
         self.update_current_gui_player()
-
         self.market = gui_cards.CardMarket(game)
         self.nobles = gui_cards.NobleMarket(game)
         self.game_bank = gui_game_bank.GameBank(game)
@@ -44,6 +43,10 @@ class GuiGameMaster:
         self.current_player.player_obj.deposit_dado('red')
         self.current_player.player_obj.deposit_dado('red')
         self.current_player.player_obj.deposit_dado('red')
+
+        self.current_player.player_obj.deposit_dado('blue')
+        self.current_player.player_obj.deposit_dado('blue')
+        #self.current_player.player_obj.deposit_dado('red')
 
 
 

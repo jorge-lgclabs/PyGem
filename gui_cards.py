@@ -3,7 +3,7 @@ import flet as ft
 import PyGem
 import cards
 
-from gui_assets import RED, GREEN, BLUE, WHITE, NOIR
+from gui_assets import RED, GREEN, BLUE, WHITE, NOIR, PLAYER_BANK_ROUNDING_RADIUS, SquareWithNum
 from gui_assets import RED_GEM, GREEN_GEM, BLUE_GEM, WHITE_GEM, NOIR_GEM, GEM_LOOKUP
 from gui_assets import FILLED_WITH_STROKE
 from gui_assets import CELL_SIZE, CARD_HEIGHT, CARD_WIDTH, CARD_ROUNDING_RADIUS, SHADE_OPACITY, GRID_SPACING
@@ -100,7 +100,6 @@ class GameCard:
 class NobleCard(GameCard):
     def __init__(self, card_obj):
         card_obj._dado = 'w'
-        card_obj._level = 3
         super().__init__(card_obj)
         self.nobles_bg = {
             'w3b3g0r0n3': 'red-noble-2.png',
@@ -155,6 +154,44 @@ class NobleCard(GameCard):
         for card_str, bg_img in self.nobles_bg.items():
             if str(self.card_obj) == card_str:
                 self.gui_obj.controls[0].src=f'/images/{bg_img}'
+
+class CardIcon:
+    def __init__(self, card_obj):
+        self.card_obj = card_obj
+        self.gui_obj = ft.Container(width=CELL_SIZE*2, height = CELL_SIZE * .8, shadow=ft.BoxShadow(
+                blur_radius=CARD_ROUNDING_RADIUS / 2,
+                spread_radius=0,
+                offset=ft.Offset(0, (CARD_ROUNDING_RADIUS / 2)),
+                color=ft.Colors.with_opacity(0.25, ft.Colors.BLACK)),
+                bgcolor=ft.Colors.with_opacity(.3, ft.Colors.GREY_50),
+                border_radius=PLAYER_BANK_ROUNDING_RADIUS * .6,
+                alignment=ft.Alignment.CENTER,
+                padding = 3)
+        self.build_card_icons()
+
+    def build_card_icons(self):
+        row = []
+        self.gui_obj.content = []
+        count = 0
+        index = 1
+        while count < 4 and index <= 9:
+            letter = str(self.card_obj)[index - 1]
+            color = GEM_LOOKUP[letter][0]
+            number = int(str(self.card_obj)[index])
+
+            if int(str(self.card_obj)[index]) > 0:
+                row.append(SquareWithNum(number, 12, color).gui_obj)
+                count += 1
+            index += 2
+
+        if len(row) == 3:
+            align = ft.MainAxisAlignment.CENTER
+        else:
+            align = ft.MainAxisAlignment.START
+
+        self.gui_obj.content = ft.Row(controls=row, spacing=3, alignment=align)
+
+
 
 class NobleMarket:
     def __init__(self, game: PyGem.GameMaster):
