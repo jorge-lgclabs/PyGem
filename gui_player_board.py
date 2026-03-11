@@ -1,10 +1,11 @@
 import flet as ft
+from flet.controls.border_radius import horizontal
 
 import cards
 import player
 
 
-from gui_assets import GEM_LOOKUP, RED_GEM, WHITE_GEM, BLUE_GEM, GREEN_GEM, NOIR_GEM, GOLD_COIN
+from gui_assets import GEM_LOOKUP, RED_GEM, WHITE_GEM, BLUE_GEM, GREEN_GEM, NOIR_GEM, GOLD_COIN, CELL_SIZE
 from gui_assets import CARD_HEIGHT, CARD_WIDTH
 from gui_assets import PLAYER_BANK_CELL_SIZE, PLAYER_BANK_HEIGHT, PLAYER_BANK_WIDTH, PLAYER_BANK_ROUNDING_RADIUS, SHADE_OPACITY
 from gui_assets import CircleWithNum, NumWithStrokeCenter, FILLED_WITH_STROKE
@@ -131,9 +132,11 @@ class PlayerReserved:
             clip_behavior=ft.ClipBehavior.ANTI_ALIAS,
             bgcolor=ft.Colors.with_opacity(.3, ft.Colors.GREY_50),
             alignment=ft.alignment.Alignment.CENTER) for _ in range(3)]
-        self.container_row.insert(0, self.acquired_nobles.gui_obj)
-        self.row = ft.Row(controls=self.container_row, vertical_alignment=ft.CrossAxisAlignment.CENTER, alignment=ft.MainAxisAlignment.CENTER)
-        self.gui_obj = ft.Container(content=self.row, alignment=ft.alignment.Alignment.CENTER, width= CARD_WIDTH * 3.15)
+        self.container_row_obj = ft.Row(controls=self.container_row, vertical_alignment=ft.CrossAxisAlignment.CENTER, alignment=ft.MainAxisAlignment.START, expand=True)
+        self.row = ft.Row(controls=[self.container_row_obj], vertical_alignment=ft.CrossAxisAlignment.CENTER, alignment=ft.MainAxisAlignment.SPACE_BETWEEN)
+        self.row.controls.insert(0, self.acquired_nobles.gui_obj)
+        self.row.controls.insert(1, ft.Container(width=50))
+        self.gui_obj = ft.Container(content=self.row, alignment=ft.alignment.Alignment.TOP_CENTER, width= PLAYER_BANK_WIDTH)
 
     def update_player_reserved_cards(self):
         player_reserved_list = self.player_obj.get_player_reserved()
@@ -161,13 +164,15 @@ class PlayerReserved:
 class PlayerAcquiredNobles:
     def __init__(self, player_obj: player.Player):
         self.player_obj = player_obj
-        self.gui_obj = ft.Column(alignment=ft.MainAxisAlignment.START)
+        self.column = ft.Column(alignment=ft.MainAxisAlignment.START, horizontal_alignment=ft.CrossAxisAlignment.START)
+        self.gui_obj = ft.Container(content=self.column, width=CELL_SIZE * 2, alignment=ft.Alignment.TOP_CENTER, height=PLAYER_BANK_HEIGHT)
         self.update_player_nobles()
 
     def update_player_nobles(self):
         noble_objs = self.player_obj.get_player_hand()
 
-        self.gui_obj.controls=[CardIcon(noble_obj).gui_obj for noble_obj in noble_objs if noble_obj._level==4]
+        self.column.controls=[CardIcon(noble_obj).gui_obj for noble_obj in noble_objs if noble_obj._level==4]
+        self.column.controls.insert(0, ft.Text(value="Earned nobles:", size=10, text_align=ft.TextAlign.CENTER))
 
 
 class GuiPlayer:
@@ -175,7 +180,6 @@ class GuiPlayer:
         self.player_obj = player_obj
         self.player_bank = PlayerBank(self.player_obj)
         self.player_reserved = PlayerReserved(self.player_obj)
-        #self.acquired_nobles = PlayerAcquiredNobles(self.player_obj)
         self.player_label = ft.Text(value=f"Current player: {self.player_obj._player_name}  ---  Points: {self.player_obj.points}", size=30, style=FILLED_WITH_STROKE, text_align=ft.TextAlign.CENTER)
 
     def get_buyable_reserved_containers(self):
