@@ -141,7 +141,7 @@ def winning_screen(player_scores: list, page, start_func):
         return e[1]
 
     results = ''
-    player_scores.sort(key=score_sort)
+    player_scores.sort(key=score_sort, reverse=True)
     winner = player_scores[0][0]
 
     for score in player_scores:

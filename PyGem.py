@@ -25,12 +25,14 @@ class GameMaster:
         for index, name in enumerate(player_names):
             self._players.append(Player(name, index+1))
 
-        self._current_player = self._players[0]
+        self._first_player = self._players[0]
+        self._current_player = self._first_player
         self._level_1_deck, self._level_2_deck, self._level_3_deck = cards.get_cards()
         self._nobles_deck = cards.get_nobles(self._num_players)
         self._bank = bank.GameBank(self._num_players)
         self._deck_pointer_1 = self._deck_pointer_2 = self._deck_pointer_3 = 4  # starts at the first face-down card at the top of deck after making 4 visible
-        self._turn = 1
+        self._round = 0
+        self._whose_turn = 1
         self._log = []
         self.initialize_visible_cards()
 
@@ -118,12 +120,15 @@ class GameMaster:
 
     def end_turn(self, message: str, is_gui=False):
         """Called by every of the available actions (take_tokens, buy_card, reserve_card) at the end of their execution, receives a message describing the action which just took place"""
-        # Construct the full log line and add it to the log
-        log_line = "Turn " + str(self._turn) + ": Player " + str(self.get_current_player().get_player_number()) + " " + self.get_current_player().get_player_name() + " took the following action: " + message
-        print(log_line)
-        self._log.append(log_line)
+        # check if this is a new round (player 1's turn of the round)
+        if self._current_player == self._first_player:
+            self._round += 1
+            self._whose_turn = 1
+        else:
+            self._whose_turn += 1
 
         # Check if any nobles have been earned
+        noble_text = ''
         for noble in self._nobles_deck:
             if noble.can_afford((self.get_current_player().get_player_dado(), 0)):
                 # the player who just took their turn has now earned a noble tile
@@ -131,20 +136,30 @@ class GameMaster:
                 self.get_current_player().add_to_hand(noble)
                 self.get_current_player().points += noble.get_points()
                 self._nobles_deck.remove(noble)
-                print(f'{self.get_current_player().get_player_name()} earned the noble {noble}')
+                noble_text = f'and earned the noble {noble}'
 
-        # check if Player has now won
-        if self.get_current_player().points >= 15:
-            if is_gui:
-                return True
+        # Construct the full log line and add it to the log
+        log_line = "Round " + str(self._round) + ": Player " + str(self.get_current_player().get_player_number()) + " " + self.get_current_player().get_player_name() + " took the following action: " + message + ' ' + noble_text
+        print(log_line)
+        self._log.append(log_line)
 
-            input(f'{self.get_current_player().get_player_name()} has won the game! Press enter for log')
-            for line in self._log:
-                print(line)
-            return
+        # check if any Player has won by the end of the round
+        for player in self._players:
+            if player.points >= 15 and self._whose_turn == len(self._players):
+                winner = player.get_player_name()
+                points = player.points
+                win_text = f'{winner} has won the game with {points} points!'
+                self._log.append(win_text)
+                if is_gui:
+                    print(win_text)
+                    return True
+
+                input(f'{win_text} Press enter for log')
+                for line in self._log:
+                    print(line)
+                return
 
         self.change_to_next_player()
-        self._turn += 1
 
 
     def take_tokens(self, player=None, is_gui=False, to_take=None):
