@@ -33,7 +33,7 @@ jobs:
 
       - name: Install dependencies
         shell: bash
-        run: pip install flet       
+        run: pip install flet flet-cli       
 
       - name: Build app
         shell: bash
