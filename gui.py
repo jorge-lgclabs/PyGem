@@ -11,6 +11,7 @@ def gui(page: ft.Page):
     page.fonts = {"lobster" : "/fonts/Lobster-Regular.ttf"}
     page.vertical_alignment = ft.MainAxisAlignment.START
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
+    page.theme_mode = ft.ThemeMode.DARK
     # page.window.height = 870
     # page.window.width = 1020
     page.window.maximized=True
