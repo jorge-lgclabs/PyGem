@@ -18,7 +18,7 @@ def gui(page: ft.Page):
 
     def start_game(player_names: list):
         game = GameMaster(player_names)
-        gui_game = GuiGameMaster(game)
+        gui_game = GuiGameMaster(game, page, start_game)
         page.controls.clear()
         page.add(gui_game.load_initial_gui())
         page.update()

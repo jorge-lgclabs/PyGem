@@ -8,14 +8,17 @@ from gui_assets import CARD_ROUNDING_RADIUS, GEM_LOOKUP
 
 
 class GuiGameMaster:
-    def __init__(self, game: GameMaster):
+    def __init__(self, game: GameMaster, page: ft.Page, start_func):
         self.game = game
+        self.page = page
+        self.start_func = start_func
         self.gui_players = [gui_player_board.GuiPlayer(player) for player in game._players]
         self.update_current_gui_player()
         self.market = gui_cards.CardMarket(game)
         self.nobles = gui_cards.NobleMarket(game)
         self.game_bank = gui_game_bank.GameBank(game)
         #self.test_moves()
+        self.test_flag = 0
         self.user_column = gui_user_column.UserColumn(game, self.go_back_from_move, self.end_turn_change_player, self.refresh_gui, self.token_giveback_handler)
         self.last_move = ''
         self.token_take_cache = []
@@ -102,7 +105,15 @@ class GuiGameMaster:
 
     def end_turn_change_player(self, e):
         self.last_move = e.control.data
-        self.game.end_turn(self.last_move)
+        has_won = self.game.end_turn(self.last_move, is_gui=True)
+
+        if has_won:
+            player_scores = []
+            for player in self.gui_players:
+                player_scores.append((player.player_obj.get_player_name(), player.player_obj.points))
+            gui_functions.winning_screen(player_scores, self.page, self.start_func)
+            return
+
         self.update_current_gui_player()
 
         for _ in range(3):

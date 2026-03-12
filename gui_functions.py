@@ -130,3 +130,31 @@ def opening_screen(start_game_func):
     column.controls.append(ft.Button("Start Game", on_click=start_handler))
 
     return container
+
+def winning_screen(player_scores: list, page, start_func):
+    def restart_game(page, start_func):
+        page.controls.clear()
+        page.overlay.clear()
+        page.add(opening_screen(start_func))
+
+    def score_sort(e):
+        return e[1]
+
+    results = ''
+    player_scores.sort(key=score_sort)
+    winner = player_scores[0][0]
+
+    for score in player_scores:
+        results += f'{score[0]} = {score[1]}\n'
+
+    container = ft.Container(height=500, width=650, bgcolor=ft.Colors.GREY_800, alignment=ft.Alignment.CENTER, border_radius=40)
+    winner_text = ft.Text(f'{winner} has won!',
+                   text_align=ft.TextAlign.CENTER, size=40)
+    result_text = ft.Text(f'{results}', text_align=ft.TextAlign.CENTER, size=25)
+    button = ft.Button('Play again', on_click=lambda: restart_game(page, start_func))
+
+
+    container.content = ft.Column([winner_text, result_text, button], alignment=ft.MainAxisAlignment.SPACE_EVENLY, horizontal_alignment=ft.CrossAxisAlignment.CENTER)
+    full_page_container = ft.Container(alignment=ft.Alignment.CENTER, content=container, width=page.width, height=page.height)
+    page.overlay.append(full_page_container)
+    page.update()

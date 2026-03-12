@@ -116,7 +116,7 @@ class GameMaster:
             print("start the token taking action")
             self.take_tokens(player)
 
-    def end_turn(self, message: str):
+    def end_turn(self, message: str, is_gui=False):
         """Called by every of the available actions (take_tokens, buy_card, reserve_card) at the end of their execution, receives a message describing the action which just took place"""
         # Construct the full log line and add it to the log
         log_line = "Turn " + str(self._turn) + ": Player " + str(self.get_current_player().get_player_number()) + " " + self.get_current_player().get_player_name() + " took the following action: " + message
@@ -135,6 +135,9 @@ class GameMaster:
 
         # check if Player has now won
         if self.get_current_player().points >= 15:
+            if is_gui:
+                return True
+
             input(f'{self.get_current_player().get_player_name()} has won the game! Press enter for log')
             for line in self._log:
                 print(line)
