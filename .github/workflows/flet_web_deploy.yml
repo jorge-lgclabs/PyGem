@@ -27,6 +27,10 @@ jobs:
       - name: Setup uv
         uses: astral-sh/setup-uv@v6
 
+      - name: Setup venv
+        shell: bash
+        run: uv venv
+
       - name: Install dependencies
         shell: bash
         run: pip install flet       
@@ -34,7 +38,7 @@ jobs:
       - name: Build app
         shell: bash
         run: | 
-          uv run flet build web gui.py --yes --verbose --base-url ${GITHUB_REPOSITORY#*/} --route-url-strategy hash
+          uv run flet build web --module-name gui --yes --verbose --base-url ${GITHUB_REPOSITORY#*/} --route-url-strategy hash
 
       - name: Upload Pages Artifact
         uses: actions/upload-pages-artifact@v4.0.0 
