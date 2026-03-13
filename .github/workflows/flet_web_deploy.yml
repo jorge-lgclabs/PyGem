@@ -31,6 +31,10 @@ jobs:
         shell: bash
         run: uv venv
 
+      - name: Install flet-cli
+        shell: bash
+        run: pip install flet-cli
+
       - name: Install dependencies
         shell: bash
         run: pip install -r requirements.txt       
