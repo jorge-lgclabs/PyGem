@@ -161,7 +161,6 @@ class GameMaster:
 
         self.change_to_next_player()
 
-
     def take_tokens(self, player=None, is_gui=False, to_take=None):
         """Method representing the in-game action of a player taking tokens. In Splendor a player can either take a single gem of 3 different kinds, or 2 of a single kind, barring there are less than 3 total of that kind"""
         if player is None:  # for the sake of the GUI implementation can call without getting current player
@@ -295,7 +294,6 @@ class GameMaster:
                 result = self._level_3_deck[self._deck_pointer_3]
                 self._deck_pointer_3 += 1
         return result
-
 
     def buy_card(self, player=None, is_gui=False, incoming_card_obj=None):
         """Method representing the in-game action of a player buying a card. In Splendor a player can buy a card if they have enough tokens and/or dado to pay its price, they then take the card from the table and place it in their hand"""
@@ -439,13 +437,15 @@ class GameMaster:
         # if the input was a number (simulates the player reserving the top face-down card of that row's deck)
         if type(card_to_reserve) == str:
             card_to_reserve = self.get_next_card(int(card_to_reserve))  # here the integer is being translated into the appropriate next face-down card from the deck
-
+        else:
+            self.get_next_card(card_to_reserve).set_visible(
+                True)  # if reserving from the table instead, take the next face-down card of that deck and make it visible (place it on table)
         # if the code has reached this part, then card_to_reserve now must contain the Card object of the card to reserved
 
         # mechanism with simulates the player taking the card and placing it in their reserve pile
         card_to_reserve.set_reserved_by(player) # set the cards 'reserved by' property to the current player
         card_to_reserve.set_visible(False)  # make the reserved not visible (take it from table)
-        self.get_next_card(card_to_reserve).set_visible(True)  # take the next face-down card of that deck and make it visible (place it on table)
+
         player.add_to_reserved(card_to_reserve)  # add card to the player's 'reserved' property
         # taking a gold token
         self._bank.withdraw('gold')
