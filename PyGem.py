@@ -208,7 +208,7 @@ class GameMaster:
         # the second token taking action: restricted to only those that are available and only those that have more than 1 if it is first_take
         available_colors = fake_bank.get_available_tokens()
         if first_take in available_colors:
-            if fake_bank.get_token_num(first_take) < 2:
+            if fake_bank.get_token_num(first_take) < 3:
                 available_colors.remove(first_take)
 
         while take == 1:
