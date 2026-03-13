@@ -219,7 +219,7 @@ class GuiGameMaster:
         for key in self.token_bank_cache.keys():
             if self.token_bank_cache[key] == 0:  # remove those colors which have been expended
                 to_remove.append(key)
-            elif key == self.token_take_cache[0] and self.token_bank_cache[key] < 2: # remove color that violates "take 2 only if 3 or more of it" rule
+            elif key == self.token_take_cache[0] and self.token_bank_cache[key] < 3: # remove color that violates "take 2 only if 3 or more of it" rule
                 to_remove.append(key)
             else:
                 remaining_colors.append(key[0])  # otherwise, leave color as remaining choice
