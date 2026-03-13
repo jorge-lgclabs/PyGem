@@ -1,2 +1,2 @@
-flet~=0.82.3.dev7807
-flet-cli~=0.82.3.dev7807
+flet~=0.82.2
+flet-cli~=0.82.2
