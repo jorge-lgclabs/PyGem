@@ -1,3 +1,2 @@
 flet~=0.82.2
 flet-cli~=0.82.2
-watchdog~=5.0.3
