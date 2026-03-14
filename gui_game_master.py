@@ -191,9 +191,17 @@ class GuiGameMaster:
                 return # end here since this is the last move if 2 of the same color are taken
             else: # if the player took another color other than the first, necessitating a third taking action
                 self.token_bank_cache[clicked_color] -= 1
+
+                # to account for the (rare) scenario where the user can only take 2 tokens of different colors
+                end_on_two=True
+                for color, bank_value in self.token_bank_cache.items():
+                    if color not in self.token_take_cache and bank_value > 0:
+                        end_on_two=False
+                        break
+
                 self.user_column.token_taking_messages(
                     first_take=self.token_take_cache[0],
-                    second_take=self.token_take_cache[1])
+                    second_take=self.token_take_cache[1],end=end_on_two)
                 if self.token_take_cache[0] in self.token_bank_cache.keys():
                     self.token_bank_cache.pop(self.token_take_cache[0])
                 self.token_bank_cache.pop(self.token_take_cache[1])
