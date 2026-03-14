@@ -1,5 +1,6 @@
-Based on the board game "Splendor"
+A 2-4 player single screen "pass and play" game based on the board game "Splendor"
+version 2.0 now with a GUI
 
-Version 2.0 now with a GUI
+Play it right here on GitHub: https://jorge-lgclabs.github.io/PyGem/
 
 by Jorge Rodriguez
