@@ -114,7 +114,8 @@ class UserColumn:
 
         # a tuple that contains the 2 args for the event handler [0] and [1], plus an event handler [2]
         event_payload = (card_obj, self.game, self.ready_to_end_turn)  # to be called by on_click handler
-        self.reserve_button.data = event_payload  # "tucking" payload into the control so it can be used by the handler
+        reserve_event_payload = event_payload + (self.token_giveback_after_reserve,)  # add a special 4th item for reserve handler
+        self.reserve_button.data = reserve_event_payload  # "tucking" payload into the control so it can be used by the handler
 
         if can_buy:
             self.buy_button.data = event_payload # tucking payload for buying
@@ -209,6 +210,26 @@ class UserColumn:
 
         column.extend(buttons)
 
+    def token_giveback_after_reserve(self, giveback_options, last_move):
+        def giveback_then_end(e):
+            color = e.control.data
+            self.game._bank.deposit(color)
+            self.game.get_current_player().withdraw(color)
+            self.ready_to_end_turn(last_move)
+
+        column = self.message_column.controls
+        column.clear()
+
+        column.append(ft.Text(f'You have 1 gem over the 10 gem limit, select which gem to give back to the bank:',
+                              text_align=ft.TextAlign.CENTER))
+        buttons = []
+        for color in giveback_options:
+            button = MessageToken(color).gui_obj
+            button.data = color
+            button.on_click = giveback_then_end
+            buttons.append(button)
+
+        column.extend(buttons)
 
     def ready_to_end_turn(self, last_move):
         self.refresh_gui()

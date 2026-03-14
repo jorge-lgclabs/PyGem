@@ -7,10 +7,18 @@ from gui_assets import CARD_ROUNDING_RADIUS, CARD_WIDTH
 from PyGem import GameMaster
 
 def gui_reserve_card(e):
-    card_to_reserve, game, ready_end_turn = e.control.data
+    card_to_reserve, game, ready_end_turn, giveback_func = e.control.data
     player = game.get_current_player()
+    last_move = game.reserve_card(player=player, is_gui=True, incoming_card=card_to_reserve)
 
-    ready_end_turn(game.reserve_card(player=player, is_gui=True, incoming_card=card_to_reserve))
+    if player.get_player_bank_length() + player.get_player_tender()[1] > 10:
+        giveback_options = []
+        for color in ['red', 'white', 'blue', 'green', 'noir']:
+            if int(player.bank_lookup(color)) > 0:
+                giveback_options.append(color)
+        giveback_func(giveback_options, last_move)
+    else:
+        ready_end_turn(last_move)
 
 def gui_buy_card(e):
     card_to_buy, game, ready_end_turn = e.control.data
