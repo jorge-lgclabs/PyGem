@@ -80,7 +80,7 @@ class GuiGameMaster:
         self.game_bank.make_bank_color_containers_clickable(token_taker_handler=self.token_click_handler)
 
         return ft.Row(controls=[self.user_column.gui_obj, self.market_and_player_board, self.game_bank.gui_obj], spacing=30,
-                        vertical_alignment=ft.CrossAxisAlignment.CENTER, alignment=ft.MainAxisAlignment.CENTER)
+                        vertical_alignment=ft.CrossAxisAlignment.START, alignment=ft.MainAxisAlignment.CENTER)
 
     def refresh_gui(self):
         self.current_player.player_reserved.update_player_reserved_cards()
