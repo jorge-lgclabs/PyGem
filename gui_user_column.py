@@ -74,7 +74,7 @@ class UserColumn:
                                     alignment=ft.MainAxisAlignment.START, spacing=7, intrinsic_width=True)
         self.player_scores_container = ft.Container(width=155, height=290, content=self.player_scores_column)
         self.full_column = ft.Column(horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                                    alignment=ft.MainAxisAlignment.START, intrinsic_width=True,
+                                    alignment=ft.MainAxisAlignment.END, intrinsic_width=True,
                                      controls=[
                                          self.top_spacer, self.message_container, self.middle_spacer, self.player_scores_container
                                      ])
