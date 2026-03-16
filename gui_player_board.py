@@ -132,7 +132,7 @@ class PlayerReserved:
             bgcolor=ft.Colors.with_opacity(.3, ft.Colors.GREY_50),
             alignment=ft.alignment.Alignment.CENTER) for _ in range(3)]
         self.container_row_obj = ft.Row(controls=self.container_row, vertical_alignment=ft.CrossAxisAlignment.CENTER, alignment=ft.MainAxisAlignment.START, expand=True)
-        self.row = ft.Row(controls=[self.container_row_obj], vertical_alignment=ft.CrossAxisAlignment.CENTER, alignment=ft.MainAxisAlignment.SPACE_BETWEEN)
+        self.row = ft.Row(controls=[self.container_row_obj], vertical_alignment=ft.CrossAxisAlignment.START, alignment=ft.MainAxisAlignment.SPACE_BETWEEN)
         self.row.controls.insert(0, self.acquired_nobles.gui_obj)
         self.row.controls.insert(1, ft.Container(width=50))
         self.gui_obj = ft.Container(content=self.row, alignment=ft.alignment.Alignment.TOP_CENTER, width= PLAYER_BANK_WIDTH)

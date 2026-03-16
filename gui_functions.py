@@ -21,10 +21,36 @@ def gui_reserve_card(e):
         ready_end_turn(last_move)
 
 def gui_buy_card(e):
-    card_to_buy, game, ready_end_turn = e.control.data
+    card_to_buy, game, ready_end_turn, noble_choose_handler = e.control.data
     player = game.get_current_player()
+    which_nobles = []
+    last_move = game.buy_card(player=player, is_gui=True, incoming_card_obj=card_to_buy)
 
-    ready_end_turn(game.buy_card(player=player, is_gui=True, incoming_card_obj=card_to_buy))
+    for noble in game._nobles_deck:
+        if noble.can_afford((player.get_player_dado(), 0)):
+            which_nobles.append(noble)
+
+    how_many_nobles = len(which_nobles)
+
+    if how_many_nobles == 1: # if a noble was earned, execute the noble tasking now and send it to end_turn
+        noble = which_nobles[0]
+        player.add_to_hand(noble)
+        player.points += noble.get_points()
+        game._nobles_deck.remove(noble)
+        noble_text = f'and earned the noble {noble}'
+        ready_end_turn(last_move + noble_text)
+    elif how_many_nobles > 1: # if more than one noble was earned, send it to noble_chooser
+        noble_choose_handler(e=None, which_nobles=which_nobles, last_move=last_move)
+    else: # if no nobles where earned
+        ready_end_turn(last_move)
+
+    # if noble:
+    #     player.add_to_hand(noble)
+    #     player.points += noble.get_points()
+    #     game._nobles_deck.remove(noble)
+    #     noble_text = f'and earned the noble {noble}'
+
+
 
 
 def gui_can_afford(card_obj: cards.Card, gui_player: gui_player_board.GuiPlayer):

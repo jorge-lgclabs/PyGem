@@ -49,7 +49,13 @@ class GuiGameMaster:
 
         self.current_player.player_obj.deposit_dado('blue')
         self.current_player.player_obj.deposit_dado('blue')
-        #self.current_player.player_obj.deposit_dado('red')
+
+        self.current_player.player_obj.deposit_dado('noir')
+        self.current_player.player_obj.deposit_dado('noir')
+
+        self.current_player.player_obj.deposit_dado('white')
+        self.current_player.player_obj.deposit_dado('white')
+
 
 
 
@@ -150,11 +156,26 @@ class GuiGameMaster:
             card_obj = container_data.card_obj
 
         if isinstance(card_obj, cards.Card) and gui_functions.gui_can_afford(card_obj, self.current_player):
-            self.user_column.reserve_or_buy_card(card_obj, can_buy=True)
+            self.user_column.reserve_or_buy_card(card_obj, can_buy=True, noble_chooser_func=self.noble_choose_handler)
         else:
-            self.user_column.reserve_or_buy_card(card_obj, can_buy=False)
+            self.user_column.reserve_or_buy_card(card_obj, can_buy=False, noble_chooser_func=self.noble_choose_handler)
 
         self.refresh_gui()
+
+    def noble_choose_handler(self, e, which_nobles=None, last_move=None):
+        if e is None: # this branch represents the setup
+            self.last_move = last_move
+            self.nobles.make_nobles_clickable(which_nobles=which_nobles, click_handler=self.noble_choose_handler)
+            self.user_column.noble_choose_message()
+        else: # this branch represents when it is being used as an event handler, after setup
+            player = self.current_player.player_obj
+            chosen_card_obj = e.control.data.card_obj
+            player.add_to_hand(chosen_card_obj)
+            player.points += chosen_card_obj.get_points()
+            self.game._nobles_deck.remove(chosen_card_obj)
+            noble_text = f'and earned the noble {chosen_card_obj}'
+            self.user_column.ready_to_end_turn(self.last_move + noble_text)
+
 
     def token_click_handler(self, e):
         gui_functions.make_cards_unclickable(self.market.get_all_containers())

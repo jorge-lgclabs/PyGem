@@ -198,6 +198,7 @@ class NobleMarket:
         self.game = game
         self.gui_obj = ft.Row()
         self.nobles_GameCard_objs = []
+        self.nobles_containers = []
         self.fill_nobles_row()
 
     def fill_nobles_row(self):
@@ -205,12 +206,24 @@ class NobleMarket:
         for noble in nobles_from_game:
             self.nobles_GameCard_objs.append(NobleCard(noble))
         for noble_GameCard in self.nobles_GameCard_objs:
-            self.gui_obj.controls.append(noble_GameCard.gui_obj)
+            container = ft.Container(content=noble_GameCard.gui_obj, data=noble_GameCard,
+                                     border=ft.Border.all(3, color=None), border_radius=CARD_ROUNDING_RADIUS)
+            self.nobles_containers.append(container)
+            self.gui_obj.controls.append(container)
 
     def refresh_nobles_row(self):
-        self.gui_obj.controls = []
+        self.gui_obj.controls = [ft.Container(height=CARD_HEIGHT *.93 + 3, width=1)]
         self.nobles_GameCard_objs = []
+        self.nobles_containers = []
         self.fill_nobles_row()
+
+    def make_nobles_clickable(self, which_nobles, click_handler):
+        for noble_card_obj in which_nobles:
+            for noble_container in self.nobles_containers:
+                if noble_card_obj == noble_container.data.card_obj:
+                    noble_container.on_click = click_handler
+                    noble_container.border = ft.Border.all(3, ft.Colors.GREEN_500)
+        self.gui_obj.update()
 
 class CardMarket:
     def __init__(self,game: PyGem.GameMaster):

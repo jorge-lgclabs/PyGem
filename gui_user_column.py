@@ -101,7 +101,7 @@ class UserColumn:
         for bar in self.player_score_objs:
             bar.refresh_player_bank_bar()
 
-    def reserve_or_buy_card(self, card_obj, can_buy: bool):
+    def reserve_or_buy_card(self, card_obj, can_buy: bool, noble_chooser_func):
         # Either render the card if it is a card or simply display top-of-deck message
         if card_obj in ['1', '2', '3']:
             cost_text = ''
@@ -115,10 +115,11 @@ class UserColumn:
         # a tuple that contains the 2 args for the event handler [0] and [1], plus an event handler [2]
         event_payload = (card_obj, self.game, self.ready_to_end_turn)  # to be called by on_click handler
         reserve_event_payload = event_payload + (self.token_giveback_after_reserve,)  # add a special 4th item for reserve handler
+        buy_event_payload = event_payload + (noble_chooser_func,)  # add a special 4th item for buy handler
         self.reserve_button.data = reserve_event_payload  # "tucking" payload into the control so it can be used by the handler
 
         if can_buy:
-            self.buy_button.data = event_payload # tucking payload for buying
+            self.buy_button.data = buy_event_payload # tucking payload for buying
 
         # fill column then conditionally make elements invisible if they are not available moves
         self.message_column.controls = [
@@ -230,6 +231,14 @@ class UserColumn:
             buttons.append(button)
 
         column.extend(buttons)
+
+    def noble_choose_message(self):
+        self.message_column.controls.clear()
+        self.message_column.controls.append(
+            ft.Text("You've earned more than one noble at the same time, wow!\n"
+                    "But you can only earn one per-turn, so please choose which one", text_align=ft.TextAlign.CENTER)
+        )
+        self.message_column.update()
 
     def ready_to_end_turn(self, last_move):
         self.refresh_gui()

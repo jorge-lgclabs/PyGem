@@ -125,17 +125,19 @@ class GameMaster:
             self._whose_turn = 1
         else:
             self._whose_turn += 1
-
-        # Check if any nobles have been earned
         noble_text = ''
-        for noble in self._nobles_deck:
-            if noble.can_afford((self.get_current_player().get_player_dado(), 0)):
-                # the player who just took their turn has now earned a noble tile
-                # mechanism representing the player taking the noble tile from the table and earning its points
-                self.get_current_player().add_to_hand(noble)
-                self.get_current_player().points += noble.get_points()
-                self._nobles_deck.remove(noble)
-                noble_text = f'and earned the noble {noble}'
+
+        # Check if any nobles have been earned (command line only, gui already handles it before getting here)
+        if not is_gui:
+            noble_text = ''
+            for noble in self._nobles_deck:
+                if noble.can_afford((self.get_current_player().get_player_dado(), 0)):
+                    # the player who just took their turn has now earned a noble tile
+                    # mechanism representing the player taking the noble tile from the table and earning its points
+                    self.get_current_player().add_to_hand(noble)
+                    self.get_current_player().points += noble.get_points()
+                    self._nobles_deck.remove(noble)
+                    noble_text = f'and earned the noble {noble}'
 
         # Construct the full log line and add it to the log
         log_line = "Round " + str(self._round) + ": Player " + str(self.get_current_player().get_player_number()) + " " + self.get_current_player().get_player_name() + " took the following action: " + message + ' ' + noble_text
