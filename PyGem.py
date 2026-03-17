@@ -333,16 +333,87 @@ class GameMaster:
 
         # at this point the card_to_buy should contain a card that is fully valid for player to buy
 
+        # mechanism representing the paying for the card by taking the appropriate tokens from the player and returning them to the game bank (paying)
+        cost_string = card_to_buy.get_cost()
+        lookup = {1:'white', 3:'blue', 5:'green', 7:'red', 9:'noir'}
+        cost_report = {}  # {'color': (num_gems, num_dado, num_gold)}
+        # Iterate through each gem and calculate what must be paid
+        for index, color in lookup.items():
+            # get the amount due of this color
+            amount_due = int(cost_string[index])
+            if amount_due == 0:  # skip if this color is not needed
+                continue
+            cost_report[color] = (0, 0, 0)
+            # get the player's amount of that gem and calculate how much is needed after factoring in the discount given by dado
+            player_amount = int(player.bank_lookup(color))
+            player_dado = int(player.dado_lookup(color))
+            gem_cost = amount_due - player_dado
+            if gem_cost <= 0: # if it only cost dado, then all dado used is equal to amount due
+                cost_report[color] = (0, amount_due, 0)
+                continue
+            if gem_cost > 0:  # if there are tokens that must be spent
+                if player_dado > 0: # if there was a dado discount, all of it was used
+                    cost_report[color] = (0, player_dado, 0)
+                # if the players tokens are not enough to cover the cost of this gem, calculate gold
+                if gem_cost - player_amount > 0:
+                    gold_needed = gem_cost - player_amount
+                    gem_needed = player_amount
+                    cost_report[color] = (gem_needed, cost_report[color][1], gold_needed)
+                    # withdraw needed gold from Player's bank and deposit into GameBank
+                    for _ in range(gold_needed):
+                        player.withdraw('gold')
+                        self._bank.deposit('gold')
+                    # withdraw all of Player's tokens of that gem and deposit into GameBank
+                    for _ in range(gem_needed):
+                        player.withdraw(color)
+                        self._bank.deposit(color)
+                # otherwise, just withdraw that many tokens from Player's bank and deposit into GameBank
+                else:
+                    cost_report[color] = (gem_cost, cost_report[color][1], 0)
+                    for _ in range (gem_cost):
+                        player.withdraw(color)
+                        self._bank.deposit(color)
+
+        cost_string = ''
+        for color, tuple in cost_report.items():
+            if tuple[0] > 1:
+                tokens_plural = 's'
+            else:
+                tokens_plural = ''
+            if tuple[2] > 1:
+                coins_plural = 's'
+            else:
+                coins_plural = ''
+            cost_string += f'{color}: '
+            if tuple[0] > 0 and tuple[1] > 0 and tuple [2] > 0:
+                cost_string += f'{tuple[0]} token{tokens_plural} and {tuple[1]} dado and {tuple[2]} gold coin{coins_plural}, '
+            elif tuple[0] > 0 and tuple[1] > 0 and tuple[2] == 0:
+                cost_string += f'{tuple[0]} token{tokens_plural} and {tuple[1]} dado, '
+            elif tuple[0] > 0 and tuple[1] == 0 and tuple[2] > 0:
+                cost_string += f'{tuple[0]} token{tokens_plural} and {tuple[2]} gold coin{coins_plural}, '
+            elif tuple[0] == 0 and tuple[1] > 0 and tuple[2] > 0:
+                cost_string += f'{tuple[1]} dado and {tuple[2]} gold coin{coins_plural}, '
+            elif tuple[2] > 0:
+                cost_string += f'{tuple[2]} gold coin{coins_plural}, '
+            elif tuple[1] > 0:
+                cost_string += f'{tuple[1]} dado, '
+            else: # tuple[0] > 0
+                cost_string += f'{tuple[0]} token{tokens_plural}, '
+
+
+        final_move = f'bought card {str(card_to_buy)} with: {cost_string}'
+
         # mechanism representing the removing of the card from row, placing it into the hand of player and replacing the card in the row (buying)
         card_to_buy.set_visible(False)  # make the bought card not visible anymore (remove from table)
         card_to_buy.set_owner(player)  # set the card's owner to the current player
         player.add_to_hand(card_to_buy)  # add it to their hand
 
-        if card_to_buy in player.get_player_reserved(): # if the player is buying it from their reserved pile
+        if card_to_buy in player.get_player_reserved():  # if the player is buying it from their reserved pile
             player.remove_from_reserved(card_to_buy)  # removes the card from player's reserve
             card_to_buy.set_reserved_by(None)  # set Card as not being reserved by anyone
-        else: # if the card was bought from the market
-            self.get_next_card(card_to_buy).set_visible(True)  # make the next card in that deck visible (place it on table)
+        else:  # if the card was bought from the market
+            self.get_next_card(card_to_buy).set_visible(
+                True)  # make the next card in that deck visible (place it on table)
 
         # giving the player the dado they have earned
         if card_to_buy.get_dado() == 'w':
@@ -359,37 +430,11 @@ class GameMaster:
         # if the card has points, player earns them
         player.points += card_to_buy.get_points()
 
-        # mechanism representing the paying for the card by taking the appropriate tokens from the player and returning them to the game bank (paying)
-        cost_string = card_to_buy.get_cost()
-        lookup = {1:'white', 3:'blue', 5:'green', 7:'red', 9:'noir'}
-        # Iterate through each gem and calculate what must be paid
-        for index, color in lookup.items():
-            # get the player's amount of that gem and calculate how much is needed after factoring in the discount given by dado
-            player_amount = int(player.bank_lookup(color))
-            gem_cost = int(cost_string[index]) - int(player.dado_lookup(color))
-            if gem_cost > 0:
-                # if the players tokens are not enough to cover the cost of this gem, calculate gold
-                if gem_cost - player_amount > 0:
-                    gold_needed = gem_cost - player_amount
-                    gem_needed = player_amount
-                    # withdraw needed gold from Player's bank and deposit into GameBank
-                    for _ in range(gold_needed):
-                        player.withdraw('gold')
-                        self._bank.deposit('gold')
-                    # withdraw all of Player's tokens of that gem and deposit into GameBank
-                    for _ in range(gem_needed):
-                        player.withdraw(color)
-                        self._bank.deposit(color)
-                # otherwise, just withdraw that many tokens from Player's bank and deposit into GameBank
-                else:
-                    for _ in range (gem_cost):
-                        player.withdraw(color)
-                        self._bank.deposit(color)
 
         if not is_gui: # original command line ending to this function
-            self.end_turn(("bought card " + str(card_to_buy)))
+            self.end_turn((final_move))
         else: # for gui
-            return "bought card " + str(card_to_buy)
+            return final_move
 
     def reserve_card(self, player=None, is_gui=False, incoming_card=None):
         """Method representing the in-game action of a player reserving a card, receives a Player object and allows that player to reserve any visible Card or the next_card of any row and receive a gold token"""
@@ -448,9 +493,10 @@ class GameMaster:
         card_to_reserve.set_visible(False)  # make the reserved not visible (take it from table)
 
         player.add_to_reserved(card_to_reserve)  # add card to the player's 'reserved' property
-        # taking a gold token
-        self._bank.withdraw('gold')
-        player.deposit_bank('gold')
+        # taking a gold token if there are any
+        if self._bank._gold > 0:
+            self._bank.withdraw('gold')
+            player.deposit_bank('gold')
 
         if not is_gui:  # original command line ending to this function
             self.end_turn(("reserved card " + str(card_to_reserve)))
