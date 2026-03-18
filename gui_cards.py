@@ -202,6 +202,7 @@ class NobleMarket:
         self.fill_nobles_row()
 
     def fill_nobles_row(self):
+        self.gui_obj.controls = [ft.Container(height=CARD_HEIGHT * .93, width=1)]
         nobles_from_game = self.game._nobles_deck
         for noble in nobles_from_game:
             self.nobles_GameCard_objs.append(NobleCard(noble))
@@ -212,7 +213,7 @@ class NobleMarket:
             self.gui_obj.controls.append(container)
 
     def refresh_nobles_row(self):
-        self.gui_obj.controls = [ft.Container(height=CARD_HEIGHT *.93 + 3, width=1)]
+        self.gui_obj.controls = [ft.Container(height=CARD_HEIGHT *.93, width=0)]
         self.nobles_GameCard_objs = []
         self.nobles_containers = []
         self.fill_nobles_row()

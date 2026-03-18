@@ -32,7 +32,10 @@ class GameBank:
         self.update_game_bank_values()
         self.shade_container = self.set_shade()
         self.grid_container = self.create_game_bank_grid()
-        self.gui_obj = ft.Container(content=ft.Stack(controls=[self.shade_container, self.grid_container], alignment=ft.alignment.Alignment.CENTER))
+        self.stack_container = ft.Container(content=ft.Stack(controls=[self.shade_container, self.grid_container], alignment=ft.alignment.Alignment.CENTER))
+        self.spacer = ft.Container(width=PLAYER_BANK_WIDTH, height=150)
+        self.final_column = ft.Column(controls=[self.spacer, self.stack_container], alignment=ft.MainAxisAlignment.START)
+        self.gui_obj = ft.Container(content=self.final_column, alignment=ft.Alignment.CENTER)
 
     def update_game_bank_values(self):
         for obj_tuple in self.text_obj_tuples:

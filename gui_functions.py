@@ -146,9 +146,11 @@ def opening_screen(start_game_func):
                        horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                        width=CARD_WIDTH * 2,
                        height=800,
-                       spacing=40)
+                       spacing=20)
     container.content = column
-    column.controls.append(ft.Container(height=200))
+    column.controls.append(ft.Container(height=150))
+    column.controls.append(ft.Text("PyGem", size=24, color=ft.Colors.GREY_100))
+    column.controls.append(ft.Text('by Jorge Rodriguez', size=9, color=ft.Colors.GREY_300))
     column.controls.append(ft.Text("Select the number of players:", text_align=ft.TextAlign.CENTER))
     dropdown = ft.Dropdown(autofocus=True,
                        options=[
@@ -162,7 +164,6 @@ def opening_screen(start_game_func):
     column.controls.append(ft.TextField(label='Enter the name of Player 1'))
     column.controls.append(ft.TextField(label='Enter the name of Player 2'))
     column.controls.append(ft.Button("Start Game", on_click=start_handler))
-
     return container
 
 def winning_screen(player_scores: list, page, start_func):
